@@ -1,0 +1,72 @@
+{
+  "name": "Deno",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/deno:1": {
+      "version": "latest"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "latest"
+    }
+  },
+  "customizations": {
+    "settings": {
+      "remote.containers.copyGitConfig": true
+    },
+    "vscode": {
+      "settings": {
+        "[typescript]": {
+          "editor.defaultFormatter": "denoland.vscode-deno",
+          "editor.codeActionsOnSave": {
+            "source.organizeImports": "always",
+            "source.removeUnusedImports": "always",
+            "source.sortImports": "always"
+          }
+        },
+        "[javascript]": {
+          "editor.defaultFormatter": null
+        },
+        "[json]": {
+          "editor.defaultFormatter": "vscode.json-language-features"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "vscode.json-language-features"
+        },
+        "editor.formatOnSave": true,
+        "fileNestingUpdater.autoUpdate": true,
+        "fileNestingUpdater.autoUpdateInterval": 720,
+        "fileNestingUpdater.promptOnAutoUpdate": false,
+        "fileNestingUpdater.upstreamRepo": "antfu/vscode-file-nesting-config",
+        "fileNestingUpdater.upstreamBranch": "main",
+        "deno.enable": true,
+        "extensions.webWorker": true,
+        "extensions.ignoreRecommendations": true
+      },
+      "extensions": [
+        // Editor
+        "editorconfig.editorconfig",
+        // Utilities
+        "aaron-bond.better-comments",
+        "ms-azuretools.vscode-containers",
+        "christian-kohler.path-intellisense",
+        "antfu.file-nesting",
+        // Language
+        "justjavac.vscode-deno-extensionpack",
+        // IntelliCode
+        "VisualStudioExptTeam.vscodeintellicode",
+        "VisualStudioExptTeam.vscodeintellicode-insiders",
+        "VisualStudioExptTeam.vscodeintellicode-completions",
+        "VisualStudioExptTeam.intellicode-api-usage-examples",
+        "ms-vsliveshare.vsliveshare"
+      ]
+    }
+  },
+  "remoteUser": "root",
+  "containerUser": "root",
+  "postCreateCommand": {
+    "safe": "git config --global --add safe.directory ${containerWorkspaceFolder}"
+  },
+  "postStartCommand": {
+    "deps_install": "deno install"
+  }
+}

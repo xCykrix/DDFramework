@@ -7,6 +7,7 @@
     "jsr:@std/path@^1.1.1": "1.1.2",
     "jsr:@std/ulid@1.0.0": "1.0.0",
     "npm:@discordeno/bot@22.0.1-next.4e4bc48": "22.0.1-next.4e4bc48",
+    "npm:@discordjs/builders@2.0.0-dev.1759363313-f510b5ffa": "2.0.0-dev.1759363313-f510b5ffa",
     "npm:dd-cache-proxy@2.6.5": "2.6.5_@discordeno+bot@22.0.1-next.4e4bc48"
   },
   "jsr": {
@@ -67,17 +68,42 @@
         "@discordeno/types"
       ]
     },
+    "@discordjs/builders@2.0.0-dev.1759363313-f510b5ffa": {
+      "integrity": "sha512-MORqSl+/RtNHavjgRA4GqYdE4URoFL4J52vu0OCV3UNhQmCj/WQTL/FQHxeGSaPfkDdYNOmwnUn4XEA6dZhc5Q==",
+      "dependencies": [
+        "@discordjs/util",
+        "discord-api-types",
+        "ts-mixer",
+        "tslib",
+        "zod"
+      ]
+    },
+    "@discordjs/util@2.0.0-dev.1759363313-f510b5ffa": {
+      "integrity": "sha512-84PwcSH7ZQnsMluBr43IfoCbhPN1V18nH2FOzm6+JdUPKeh0peStaRljSwiTRRFDcdY5CufcNvde/5kksH0kJA=="
+    },
     "dd-cache-proxy@2.6.5_@discordeno+bot@22.0.1-next.4e4bc48": {
       "integrity": "sha512-qhY+R5r+bpIv0yOQHAJZvECmgNVojj7HAfj+Exn3k0d0qP4DzV58mNl1DJrPFPTw4cayT23FSm4OXIIAJy586g==",
       "dependencies": [
         "@discordeno/bot"
       ]
     },
+    "discord-api-types@0.38.26": {
+      "integrity": "sha512-xpmPviHjIJ6dFu1eNwNDIGQ3N6qmPUUYFVAx/YZ64h7ZgPkTcKjnciD8bZe8Vbeji7yS5uYljyciunpq0J5NSw=="
+    },
     "fzstd@0.1.1": {
       "integrity": "sha512-dkuVSOKKwh3eas5VkJy1AW1vFpet8TA/fGmVA5krThl8YcOVE/8ZIoEA1+U1vEn5ckxxhLirSdY837azmbaNHA=="
     },
+    "ts-mixer@6.0.4": {
+      "integrity": "sha512-ufKpbmrugz5Aou4wcr5Wc1UUFWOLhq+Fm6qa6P0w0K5Qw2yhaUoiWszhCVuNQyNwrlGiscHOmqYoAox1PtvgjA=="
+    },
+    "tslib@2.8.1": {
+      "integrity": "sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w=="
+    },
     "ws@8.18.3": {
       "integrity": "sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg=="
+    },
+    "zod@4.1.11": {
+      "integrity": "sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg=="
     }
   }
 }

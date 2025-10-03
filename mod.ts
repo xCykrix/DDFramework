@@ -15,7 +15,7 @@ export type DDBotInternal = BotWithCacheProxy<DDFrameworkDesiredProperties>;
  */
 export class DDFramework<T extends DDFrameworkDesiredProperties = MinimalDesiredProperties> {
   private options: DDFrameworkOptions;
-  #internal: BotWithCacheProxy<T>;
+  private _internal_client: BotWithCacheProxy<T>;
 
   /** Event Manager for easily registering listeners. */
   public events: EventManager<T>;
@@ -63,9 +63,9 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = MinimalDesired
       };
     }
 
-    this.#internal = new ClientGenerator<T>().create(options.token, desiredProperties);
+    this._internal_client = new ClientGenerator<T>().create(options.token, desiredProperties);
     this.events = new EventManager<T>(this, options);
-    this.leaf = new LeafManager(this, options);
+    this.leaf = new LeafManager(this as unknown as DDFrameworkInternal, options);
 
     this.helpers = {
       permissions: new Permissions<T>(this),
@@ -74,12 +74,12 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = MinimalDesired
 
   /** Get the internal bot instance. */
   public get internal(): BotWithCacheProxy<T> {
-    return this.#internal;
+    return this._internal_client;
   }
 
   /** Start the application. */
   public async start(): Promise<void> {
-    await this.#internal.start().catch((e) => {
+    await this._internal_client.start().catch((e) => {
       this.options.errorHandler?.(e);
     });
   }

@@ -1,7 +1,7 @@
 import { createDDFrameworkProperties } from './lib/desired.ts';
 import { DDFramework } from './mod.ts';
 
-const ddfw = DDFramework.create(
+const framework = DDFramework.create(
   {
     applicationId: Deno.env.get('APPLICATION_ID') ?? '',
     publicKey: Deno.env.get('PUBLIC_KEY') ?? '',
@@ -12,7 +12,9 @@ const ddfw = DDFramework.create(
       console.error('[DDFramework] Captured Internal Error\n', error);
     },
   },
-  createDDFrameworkProperties({}),
+  createDDFrameworkProperties({
+    
+  }),
 );
 
-await ddfw.start();
+await framework.start();

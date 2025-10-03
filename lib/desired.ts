@@ -86,44 +86,36 @@ export const desiredPropertiesMinimal = Discordeno.createDesiredPropertiesObject
   },
 });
 
-// Utility function to merge user properties with required ones
-// Recursively fill missing keys with false
-function fillDefaults<T extends object>(userProps: T, allProps: Record<string, unknown>): T & Record<string, false> {
-  const result: Record<string, unknown> = {};
-  for (const key in allProps) {
-    if (!Object.prototype.hasOwnProperty.call(allProps, key)) continue;
-    const userValue = (userProps as Record<string, unknown>)[key];
-    const allValue = allProps[key];
-    if (typeof allValue === 'object' && allValue !== null && !Array.isArray(allValue)) {
-      result[key] = fillDefaults(
-        typeof userValue === 'object' && userValue !== null ? userValue : {},
-        allValue as Record<string, unknown>,
-      );
-    } else {
-      result[key] = key in userProps ? userValue : false;
-    }
-  }
-  // Also copy any user keys not in allProps
-  for (const key in userProps as Record<string, unknown>) {
-    if (!Object.prototype.hasOwnProperty.call(userProps, key)) continue;
-    if (!(key in result)) {
-      result[key] = (userProps as Record<string, unknown>)[key];
-    }
-  }
-  return result as T & Record<string, false>;
-}
-
-
 // Make all desired properties optional at the type level
 type OptionalDesiredProperties<T> = {
-  [K in keyof T]?: T[K] extends object ? OptionalDesiredProperties<T[K]> : T[K];
+  [K in keyof T]?: T[K] extends Discordeno.TransformersDesiredProperties ? OptionalDesiredProperties<T[K]> : T[K];
 };
 
-export function createDDFrameworkProperties<T extends object>(
+// Utility function to merge user properties with required ones
+export function createDDFrameworkProperties<T extends Discordeno.TransformersDesiredProperties>(
   userProperties: OptionalDesiredProperties<T>,
 ): T & typeof desiredPropertiesMinimal {
-  // Fill missing keys with false, using desiredPropertiesMinimal as the schema
-  return fillDefaults(userProperties, desiredPropertiesMinimal) as T & typeof desiredPropertiesMinimal;
+  const result = {
+    ...desiredPropertiesMinimal,
+    ...userProperties,
+  } as T & typeof desiredPropertiesMinimal;
+
+  // Automatically merge all first-level objects from desiredPropertiesMinimal
+  const minimalKeys = Object.keys(desiredPropertiesMinimal) as (keyof typeof desiredPropertiesMinimal)[];
+
+  for (const key of minimalKeys) {
+    const minimalValue = desiredPropertiesMinimal[key];
+    const userValue = (userProperties as Record<string | symbol, unknown>)[key];
+
+    if (typeof minimalValue === 'object' && minimalValue !== null) {
+      (result as Record<string | symbol, unknown>)[key] = {
+        ...minimalValue,
+        ...(typeof userValue === 'object' && userValue !== null ? userValue : {}),
+      };
+    }
+  }
+
+  return result;
 }
 
 // Type alias for the minimal properties for easier use

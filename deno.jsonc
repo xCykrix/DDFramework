@@ -1,6 +1,4 @@
 {
-  "name": "@arcanis/arcanis",
-  "version": "1.0.0",
   // Imports
   "nodeModulesDir": "none",
   // Compiler Options

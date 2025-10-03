@@ -2,97 +2,128 @@ import { Discordeno } from '../deps.ts';
 
 // Define the minimum required properties your framework needs
 export const desiredPropertiesMinimal = Discordeno.createDesiredPropertiesObject({
-  guild: {
-    afkChannelId: false,
-    afkTimeout: false,
-    applicationId: true,
-    approximateMemberCount: true,
-    approximatePresenceCount: false,
-    banner: false,
-    channels: true,
-    defaultMessageNotifications: false,
-    description: false,
-    discoverySplash: false,
-    emojis: true,
-    explicitContentFilter: false,
-    icon: false,
-    iconHash: false,
+  channel: {
     id: true,
-    incidentsData: false,
-    joinedAt: false,
-    large: false,
-    maxMembers: false,
-    maxPresences: false,
-    maxStageVideoChannelUsers: false,
-    maxVideoChannelUsers: false,
-    memberCount: false,
-    members: true,
-    mfaLevel: false,
+    parentId: true,
+    guildId: true,
+    type: true,
+    position: true,
     name: true,
-    nsfwLevel: false,
-    owner: true,
-    ownerId: true,
     permissions: true,
-    preferredLocale: false,
-    premiumProgressBarEnabled: false,
-    premiumSubscriptionCount: false,
-    premiumTier: false,
-    presences: false,
-    publicUpdatesChannelId: true,
-    roles: true,
-    rulesChannelId: false,
-    safetyAlertsChannelId: true,
-    shardId: true,
-    splash: false,
-    stageInstances: false,
-    stickers: false,
-    systemChannelFlags: true,
-    systemChannelId: true,
+    permissionOverwrites: true,
+    flags: true,
+  },
+  component: {},
+  defaultReactionEmoji: {},
+  guild: {
+    id: true,
+    ownerId: true,
     toggles: true,
-    unavailable: true,
-    vanityUrlCode: false,
-    verificationLevel: false,
-    voiceStates: false,
-    welcomeScreen: false,
-    widgetChannelId: false,
-    widgetEnabled: false,
+    permissions: true,
+    roles: true,
   },
   interaction: {
-    // Add required interaction properties here
-  },
-  interactionCallback: {
-    // Add required interactionCallback properties here
+    id: true,
+    applicationId: true,
+    type: true,
+    guild: true,
+    guildId: true,
+    channel: true,
+    channelId: true,
+    member: true,
+    user: true,
+    token: true,
+    message: true,
+    data: true,
+    appPermissions: true,
+    context: true,
   },
   interactionCallbackResponse: {
-    // Add required interactionCallbackResponse properties here
+    interaction: true,
+    resource: true,
+  },
+  interactionCallback: {
+    id: true,
+    type: true,
+  },
+  interactionResource: {
+    type: true,
+    message: true,
+  },
+  member: {
+    id: true,
+    toggles: true,
+    guildId: true,
+    user: true,
+    roles: true,
+    permissions: true,
+  },
+  message: {
+    id: true,
+    guildId: true,
+    channelId: true,
+    author: true,
+    member: true,
+    content: true,
+    components: true,
+    embeds: true,
+    interactionMetadata: true,
+    nonce: true,
+    type: true,
+  },
+  role: {
+    id: true,
+    guildId: true,
+    toggles: true,
+    permissions: true,
+    name: true,
+    position: true,
+  },
+  user: {
+    id: true,
+    flags: true,
+    toggles: true,
   },
 });
 
 // Utility function to merge user properties with required ones
-export function createDDFrameworkProperties<T extends Discordeno.TransformersDesiredProperties>(
-  userProperties: T,
-): T & typeof desiredPropertiesMinimal {
-  const result = {
-    ...desiredPropertiesMinimal,
-    ...userProperties,
-  } as T & typeof desiredPropertiesMinimal;
-
-  // Automatically merge all first-level objects from desiredPropertiesMinimal
-  const minimalKeys = Object.keys(desiredPropertiesMinimal) as (keyof typeof desiredPropertiesMinimal)[];
-
-  for (const key of minimalKeys) {
-    const minimalValue = desiredPropertiesMinimal[key];
-    const userValue = (userProperties as Record<string, unknown>)[key];
-
-    if (typeof minimalValue === 'object' && minimalValue !== null) {
-      (result as Record<string, unknown>)[key] = {
-        ...minimalValue,
-        ...(typeof userValue === 'object' && userValue !== null ? userValue : {}),
-      };
+// Recursively fill missing keys with false
+function fillDefaults<T extends object>(userProps: T, allProps: Record<string, unknown>): T & Record<string, false> {
+  const result: Record<string, unknown> = {};
+  for (const key in allProps) {
+    if (!Object.prototype.hasOwnProperty.call(allProps, key)) continue;
+    const userValue = (userProps as Record<string, unknown>)[key];
+    const allValue = allProps[key];
+    if (typeof allValue === 'object' && allValue !== null && !Array.isArray(allValue)) {
+      result[key] = fillDefaults(
+        typeof userValue === 'object' && userValue !== null ? userValue : {},
+        allValue as Record<string, unknown>,
+      );
+    } else {
+      result[key] = key in userProps ? userValue : false;
     }
   }
+  // Also copy any user keys not in allProps
+  for (const key in userProps as Record<string, unknown>) {
+    if (!Object.prototype.hasOwnProperty.call(userProps, key)) continue;
+    if (!(key in result)) {
+      result[key] = (userProps as Record<string, unknown>)[key];
+    }
+  }
+  return result as T & Record<string, false>;
+}
 
-  return result;
+
+// Make all desired properties optional at the type level
+type OptionalDesiredProperties<T> = {
+  [K in keyof T]?: T[K] extends object ? OptionalDesiredProperties<T[K]> : T[K];
+};
+
+export function createDDFrameworkProperties<T extends object>(
+  userProperties: OptionalDesiredProperties<T>,
+): T & typeof desiredPropertiesMinimal {
+  // Fill missing keys with false, using desiredPropertiesMinimal as the schema
+  return fillDefaults(userProperties, desiredPropertiesMinimal) as T & typeof desiredPropertiesMinimal;
 }
 
 // Type alias for the minimal properties for easier use

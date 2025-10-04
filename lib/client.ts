@@ -1,5 +1,5 @@
-import { DDCacheProxy, Discordeno } from '../../deps.ts';
-import type { DDFrameworkDesiredProperties } from '../desired.ts';
+import { DDCacheProxy, Discordeno } from '../deps.ts';
+import type { DDFrameworkDesiredProperties } from './desired.ts';
 
 /**
  * A bot instance with integrated caching capabilities.

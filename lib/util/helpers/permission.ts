@@ -1,7 +1,7 @@
 import { Discordeno } from '../../../deps.ts';
 import type { DDFramework, DDFrameworkInternal } from '../../../mod.ts';
 import type { DDFrameworkDesiredProperties } from '../../desired.ts';
-import type { BotWithCacheProxy } from '../client.ts';
+import type { BotWithCacheProxy } from '../../client.ts';
 
 const THREAD_CHANNEL_TYPES = new Set([
   Discordeno.ChannelTypes.AnnouncementThread,

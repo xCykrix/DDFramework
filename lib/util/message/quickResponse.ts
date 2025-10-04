@@ -1,5 +1,5 @@
 import { Discordeno, DiscordJSBuilders, ulid } from '../../../deps.ts';
-import type { DDFrameworkOptions } from '../../options.ts';
+import type { DDFrameworkOptions } from '../../../mod.types.ts';
 import { fastComponentV2 } from './componentHelpers.ts';
 
 /**

@@ -1,6 +1,6 @@
 import { deepMerge, Discordeno } from '../../deps.ts';
 import type { DDFrameworkInternal } from '../../mod.ts';
-import type { DDFrameworkOptions } from '../options.ts';
+import type { DDFrameworkOptions } from '../../mod.types.ts';
 import { injectChatInputHandler } from '../util/internal/event/chatInputHandler.ts';
 import { mergeChatInputJSON } from '../util/object/mergeChatInputJSON.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, Option } from './leaf.types.ts';
@@ -136,4 +136,3 @@ export class LeafManager {
     this.linkedSchemas.set(name, merged);
   }
 }
-export type { AutoCompleteResponse, BaseOption, BooleanOption, ChannelOption, ChatInputArgs, ChatInputCommandJSON, DynamicInjectedHandler, ExtractArgsFromOptions, HandlerOptions, HandlerPassthrough, IntegerOption, LeafDefinition, LeafTypeMap, MentionableOption, NumberOption, Option, RoleOption, StringOption, SubCommandGroupOption, SubCommandOption, UserOption } from './leaf.types.ts';

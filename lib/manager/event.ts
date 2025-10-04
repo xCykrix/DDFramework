@@ -1,7 +1,7 @@
 import type { DDFramework } from '../../mod.ts';
 import type { DDFrameworkDesiredProperties } from '../desired.ts';
-import type { DDFrameworkOptions } from '../options.ts';
-import type { BotWithCacheProxy } from '../util/client.ts';
+import type { DDFrameworkOptions } from '../../mod.types.ts';
+import type { BotWithCacheProxy } from '../client.ts';
 
 /**
  * Extracts the parameter types of a specific event from the bot's event handlers.

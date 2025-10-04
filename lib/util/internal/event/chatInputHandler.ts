@@ -2,7 +2,7 @@ import { Discordeno } from '../../../../deps.ts';
 import type { DDFramework } from '../../../../mod.ts';
 import type { DDFrameworkDesiredProperties } from '../../../desired.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions } from '../../../manager/leaf.types.ts';
-import type { DDFrameworkOptions } from '../../../options.ts';
+import type { DDFrameworkOptions } from '../../../../mod.types.ts';
 import { QuickResponse } from '../../message/quickResponse.ts';
 import { getFirstPathOfApplicationCommand } from '../../object/getFirstPathOfApplicationCommand.ts';
 

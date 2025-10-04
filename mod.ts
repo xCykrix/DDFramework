@@ -2,8 +2,8 @@ import { ulid } from './deps.ts';
 import { createDDFrameworkProperties, type DDBotDesiredMinimalProperties, type DDFrameworkDesiredProperties, type MinimalDesiredProperties } from './lib/desired.ts';
 import { EventManager } from './lib/manager/event.ts';
 import { LeafManager } from './lib/manager/leaf.ts';
-import type { DDFrameworkOptions } from './lib/options.ts';
-import { type BotWithCacheProxy, ClientGenerator } from './lib/util/client.ts';
+import type { DDFrameworkOptions } from './mod.types.ts';
+import { type BotWithCacheProxy, ClientGenerator } from './lib/client.ts';
 import { Permissions } from './lib/util/helpers/permission.ts';
 
 /**

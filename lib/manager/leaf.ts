@@ -65,12 +65,7 @@ export class LeafManager {
    * @param definition - The leaf definition to register.
    */
   public linkLeaf<T extends ChatInputCommandJSON>(definition: LeafDefinition<T>): void {
-    const commandPaths = new Set<string>([definition.schema.name]);
-    for (const path of this.getDynamicPath(definition.schema.name, definition.schema.options)) {
-      commandPaths.add(path);
-    }
-
-    for (const path of commandPaths) {
+    for (const path of this.iterateCommandPaths(definition.schema.name, definition.schema.options)) {
       this.registerLink(path, definition);
     }
 
@@ -79,52 +74,35 @@ export class LeafManager {
       this.registerLink(componentPath, definition);
     }
 
-    if (!this.linkedSchemas.has(definition.schema.name)) {
-      this.linkedSchemas.set(definition.schema.name, definition.schema);
-    } else {
-      const merge = deepMerge.deepMerge.withOptions<ChatInputCommandJSON>(
-        {
-          arrayMergeStrategy: 'unique',
-          setMergeStrategy: 'combine',
-          mapMergeStrategy: 'combine',
-          customMergeFunctions: {
-            Array: mergeChatInputJSON,
-          },
-        },
-        this.linkedSchemas.get(definition.schema.name)!,
-        definition.schema,
-      );
-      this.linkedSchemas.set(definition.schema.name, merge);
-    }
+    this.mergeSchema(definition.schema.name, definition.schema);
   }
 
   /**
-   * Recursively get dynamic command/component paths from options.
+   * Recursively iterate dynamic command/component paths from options.
    *
    * @param base - The base path to start from.
    * @param options - The options to extract paths from.
    * @returns An array of dynamic paths.
    */
-  private getDynamicPath(
+  private *iterateCommandPaths(
     base: string,
     options?: readonly Option[],
-  ): string[] {
-    if (!options) return [];
-    const paths: string[] = [];
+  ): Generator<string, void, undefined> {
+    yield base;
+    if (!options) return;
+
     for (const option of options) {
-      // Only include if type is ChatInput, SubCommand, or SubCommandGroup
       if (
         option.type === Discordeno.ApplicationCommandOptionTypes.SubCommand ||
         option.type === Discordeno.ApplicationCommandOptionTypes.SubCommandGroup
       ) {
         const currentPath = `${base}.${option.name}`;
-        paths.push(currentPath);
+        yield currentPath;
         if ('options' in option && Array.isArray(option.options)) {
-          paths.push(...this.getDynamicPath(currentPath, option.options));
+          yield* this.iterateCommandPaths(currentPath, option.options);
         }
       }
     }
-    return paths;
   }
 
   /**
@@ -133,6 +111,29 @@ export class LeafManager {
   private registerLink<T extends ChatInputCommandJSON>(path: string, definition: LeafDefinition<T>): void {
     this.linkedDynamics.set(path, definition.handler as DynamicInjectedHandler<ChatInputCommandJSON>);
     this.linkedOptions.set(path, definition.options);
+  }
+
+  private mergeSchema(name: string, schema: ChatInputCommandJSON): void {
+    const existing = this.linkedSchemas.get(name);
+    if (!existing) {
+      this.linkedSchemas.set(name, schema);
+      return;
+    }
+
+    const merged = deepMerge.deepMerge.withOptions<ChatInputCommandJSON>(
+      {
+        arrayMergeStrategy: 'unique',
+        setMergeStrategy: 'combine',
+        mapMergeStrategy: 'combine',
+        customMergeFunctions: {
+          Array: mergeChatInputJSON,
+        },
+      },
+      existing,
+      schema,
+    );
+
+    this.linkedSchemas.set(name, merged);
   }
 }
 export type { AutoCompleteResponse, BaseOption, BooleanOption, ChannelOption, ChatInputArgs, ChatInputCommandJSON, DynamicInjectedHandler, ExtractArgsFromOptions, HandlerOptions, HandlerPassthrough, IntegerOption, LeafDefinition, LeafTypeMap, MentionableOption, NumberOption, Option, RoleOption, StringOption, SubCommandGroupOption, SubCommandOption, UserOption } from './leaf.types.ts';

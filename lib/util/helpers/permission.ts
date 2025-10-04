@@ -3,6 +3,20 @@ import type { DDFramework, DDFrameworkInternal } from '../../../mod.ts';
 import type { DDFrameworkDesiredProperties } from '../../desired.ts';
 import type { BotWithCacheProxy } from '../client.ts';
 
+const THREAD_CHANNEL_TYPES = new Set([
+  Discordeno.ChannelTypes.AnnouncementThread,
+  Discordeno.ChannelTypes.PrivateThread,
+  Discordeno.ChannelTypes.PublicThread,
+]);
+
+type OverwriteTuple = ReturnType<typeof Discordeno.separateOverwrites>;
+
+interface ChannelPermissionContext {
+  overwrites: OverwriteTuple[];
+  guildId: bigint;
+  isThread: boolean;
+}
+
 /**
  * Permissions utility class for calculating and validating Discord permissions in DDFramework.
  *
@@ -34,11 +48,12 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
   ): bigint {
     if (!guild || !member) return 0n;
 
-    let permissions = BigInt(
-      [guild.id, ...member.roles]
-        .map((id) => guild.roles?.get(id)?.permissions?.bitfield ?? 0n)
-        .reduce((acc, perm) => acc | perm, 0n),
-    );
+    const memberRoles = member.roles ?? [];
+    let permissions = guild.roles?.get(guild.id)?.permissions?.bitfield ?? 0n;
+
+    for (const roleId of memberRoles) {
+      permissions |= guild.roles?.get(roleId)?.permissions?.bitfield ?? 0n;
+    }
 
     if (guild.ownerId === member.id) {
       permissions |= BigInt(Discordeno.BitwisePermissionFlags.ADMINISTRATOR);
@@ -59,45 +74,11 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     channelId: bigint,
     member: typeof this.framework.internal.cache.$inferredTypes.member | typeof this.framework.internal.transformers.$inferredTypes.member,
   ): bigint {
-    const channel = guild.channels?.get(channelId);
-    if (!channel) return 0n;
+    const context = this.resolveChannelContext(guild, channelId);
+    if (!context) return 0n;
 
-    const isThread = [Discordeno.ChannelTypes.AnnouncementThread, Discordeno.ChannelTypes.PrivateThread, Discordeno.ChannelTypes.PublicThread].includes(channel.type);
-    const parentChannel = isThread ? guild.channels?.get(channel.parentId!) : channel;
-    if (!parentChannel) return 0n;
-
-    let permissions = this.calculateBasePermissions(guild, member);
-
-    const overwrites = parentChannel.internalOverwrites ?? [];
-
-    const everyoneOverwrite = overwrites.find((overwrite) => Discordeno.separateOverwrites(overwrite)[1] === parentChannel.guildId);
-    if (everyoneOverwrite) {
-      const [, , allow, deny] = Discordeno.separateOverwrites(everyoneOverwrite);
-      permissions = (permissions & ~deny) | allow;
-    }
-
-    let allow = 0n;
-    let deny = 0n;
-    for (const overwrite of overwrites) {
-      const [, id, allowBits, denyBits] = Discordeno.separateOverwrites(overwrite);
-      if (member.roles?.includes(id)) {
-        deny |= denyBits;
-        allow |= allowBits;
-      }
-    }
-    permissions = (permissions & ~deny) | allow;
-
-    const memberOverwrite = overwrites.find((overwrite) => Discordeno.separateOverwrites(overwrite)[1] === member.id);
-    if (memberOverwrite) {
-      const [, , allowBits, denyBits] = Discordeno.separateOverwrites(memberOverwrite);
-      permissions = (permissions & ~denyBits) | allowBits;
-    }
-
-    if (isThread && (permissions & BigInt(Discordeno.BitwisePermissionFlags.SEND_MESSAGES_IN_THREADS))) {
-      permissions |= BigInt(Discordeno.BitwisePermissionFlags.SEND_MESSAGES);
-    }
-
-    return permissions;
+    const basePermissions = this.calculateBasePermissions(guild, member);
+    return this.applyChannelOverwrites(basePermissions, context, member.roles ?? [], member.id);
   }
 
   /**
@@ -113,47 +94,12 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     channelId: bigint,
     roleId: bigint,
   ): bigint {
-    const channel = guild.channels?.get(channelId);
-    if (!channel) return 0n;
-
-    const isThread = [Discordeno.ChannelTypes.AnnouncementThread, Discordeno.ChannelTypes.PrivateThread, Discordeno.ChannelTypes.PublicThread].includes(channel.type);
-    const parentChannel = isThread ? guild.channels?.get(channel.parentId!) : channel;
-    if (!parentChannel) return 0n;
-
     const role = guild.roles?.get(roleId);
     if (!role) return 0n;
+    const context = this.resolveChannelContext(guild, channelId);
+    if (!context) return 0n;
 
-    let permissions = role.permissions.bitfield;
-    const overwrites = parentChannel.internalOverwrites ?? [];
-
-    const everyoneOverwrite = overwrites.find((overwrite) => Discordeno.separateOverwrites(overwrite)[1] === parentChannel.guildId);
-    if (everyoneOverwrite) {
-      const [, , allow, deny] = Discordeno.separateOverwrites(everyoneOverwrite);
-      permissions = (permissions & ~deny) | allow;
-    }
-
-    let allow = 0n;
-    let deny = 0n;
-    for (const overwrite of overwrites) {
-      const [, id, allowBits, denyBits] = Discordeno.separateOverwrites(overwrite);
-      if (id === roleId) {
-        deny |= denyBits;
-        allow |= allowBits;
-      }
-    }
-    permissions = (permissions & ~deny) | allow;
-
-    const roleOverwrite = overwrites.find((overwrite) => Discordeno.separateOverwrites(overwrite)[1] === roleId);
-    if (roleOverwrite) {
-      const [, , allowBits, denyBits] = Discordeno.separateOverwrites(roleOverwrite);
-      permissions = (permissions & ~denyBits) | allowBits;
-    }
-
-    if (isThread && (permissions & BigInt(Discordeno.BitwisePermissionFlags.SEND_MESSAGES_IN_THREADS))) {
-      permissions |= BigInt(Discordeno.BitwisePermissionFlags.SEND_MESSAGES);
-    }
-
-    return permissions;
+    return this.applyChannelOverwrites(role.permissions.bitfield, context, [roleId], roleId);
   }
 
   /**
@@ -164,14 +110,7 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
    * @returns An array of missing permission strings.
    */
   public getMissingPerms(permissionBits: bigint, permissions: Discordeno.PermissionStrings[]): string[] {
-    if (permissionBits & BigInt(Discordeno.BitwisePermissionFlags.ADMINISTRATOR)) return [];
-    const missingPermissions: string[] = [];
-    for (const permission of permissions) {
-      if (!(permissionBits & BigInt(Discordeno.BitwisePermissionFlags[permission]))) {
-        missingPermissions.push(permission);
-      }
-    }
-    return missingPermissions;
+    return this.missingPermissions(permissionBits, permissions);
   }
 
   /**
@@ -182,13 +121,7 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
    * @returns True if the permissions are valid, false otherwise.
    */
   public validatePermissions(permissionBits: bigint, permissions: Discordeno.PermissionStrings[]): boolean {
-    if (permissionBits & BigInt(Discordeno.BitwisePermissionFlags.ADMINISTRATOR)) return true;
-    for (const permission of permissions) {
-      if (!(permissionBits & BigInt(Discordeno.BitwisePermissionFlags[permission]))) {
-        return false;
-      }
-    }
-    return true;
+    return this.missingPermissions(permissionBits, permissions).length === 0;
   }
 
   /**
@@ -239,7 +172,7 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
     member: typeof this.framework.internal.cache.$inferredTypes.member | typeof this.framework.internal.transformers.$inferredTypes.member,
     permissions: T[],
-  ): Discordeno.PermissionStrings[] {
+  ): T[] {
     const permissionBits = this.calculateBasePermissions(guild, member);
     return this.missingPermissions<T>(permissionBits, permissions);
   }
@@ -258,7 +191,7 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     channelId: bigint,
     member: typeof this.framework.internal.cache.$inferredTypes.member | typeof this.framework.internal.transformers.$inferredTypes.member,
     permissions: T[],
-  ): Discordeno.PermissionStrings[] {
+  ): T[] {
     const permissionBits = this.calculateCachedChannelOverwrites(guild, channelId, member);
     return this.missingPermissions<T>(permissionBits, permissions);
   }
@@ -270,8 +203,9 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
    * @param permissions - The permissions to check.
    * @returns An array of missing permission strings.
    */
-  public missingPermissions<T extends Discordeno.PermissionStrings>(permissionBits: bigint, permissions: T[]): Discordeno.PermissionStrings[] {
-    if (permissionBits & 8n) return [];
+  public missingPermissions<T extends Discordeno.PermissionStrings>(permissionBits: bigint, permissions: T[]): T[] {
+    const adminFlag = BigInt(Discordeno.BitwisePermissionFlags.ADMINISTRATOR);
+    if (permissionBits & adminFlag) return [];
 
     return permissions.filter((permission) => !(permissionBits & BigInt(Discordeno.BitwisePermissionFlags[permission])));
   }
@@ -367,5 +301,62 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     if (guild.ownerId === member.id) return true;
     const memberHighestRole = this.highestRole(guild, member);
     return this.higherRolePosition(guild, memberHighestRole?.id ?? 0n, compareRoleId);
+  }
+
+  private resolveChannelContext(
+    guild: typeof this.framework.internal.cache.$inferredTypes.guild,
+    channelId: bigint,
+  ): ChannelPermissionContext | undefined {
+    const channel = guild.channels?.get(channelId);
+    if (!channel) return undefined;
+
+    const isThread = THREAD_CHANNEL_TYPES.has(channel.type);
+    const parentChannel = isThread ? guild.channels?.get(channel.parentId!) : channel;
+    if (!parentChannel) return undefined;
+
+    const overwrites = parentChannel.internalOverwrites?.map((overwrite) => Discordeno.separateOverwrites(overwrite)) ?? [];
+    const guildId = parentChannel.guildId ?? guild.id;
+
+    return { overwrites, guildId, isThread };
+  }
+
+  private applyChannelOverwrites(
+    permissionBits: bigint,
+    context: ChannelPermissionContext,
+    roleIds: readonly bigint[] | undefined,
+    targetId: bigint,
+  ): bigint {
+    const { overwrites, guildId, isThread } = context;
+
+    const everyoneOverwrite = overwrites.find(([, id]) => id === guildId);
+    if (everyoneOverwrite) {
+      const [, , allowBits, denyBits] = everyoneOverwrite;
+      permissionBits = (permissionBits & ~denyBits) | allowBits;
+    }
+
+    if (roleIds && roleIds.length) {
+      const roleSet = new Set(roleIds);
+      let allow = 0n;
+      let deny = 0n;
+      for (const [, id, allowBits, denyBits] of overwrites) {
+        if (roleSet.has(id)) {
+          deny |= denyBits;
+          allow |= allowBits;
+        }
+      }
+      permissionBits = (permissionBits & ~deny) | allow;
+    }
+
+    const targetOverwrite = overwrites.find(([, id]) => id === targetId);
+    if (targetOverwrite) {
+      const [, , allowBits, denyBits] = targetOverwrite;
+      permissionBits = (permissionBits & ~denyBits) | allowBits;
+    }
+
+    if (isThread && (permissionBits & BigInt(Discordeno.BitwisePermissionFlags.SEND_MESSAGES_IN_THREADS))) {
+      permissionBits |= BigInt(Discordeno.BitwisePermissionFlags.SEND_MESSAGES);
+    }
+
+    return permissionBits;
   }
 }

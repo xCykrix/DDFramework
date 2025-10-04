@@ -4,10 +4,10 @@ import { Discordeno } from '../deps.ts';
  * Minimal desired properties for DDFramework.
  *
  * This object defines the default set of properties that will be available on all entities
- * unless explicitly overridden in user configuration. Properties not specified will default to `false`.
+ * unless explicitly overridden in user configuration. Properties not specified will inherit these defaults.
  *
  * @remarks
- * Used as the base for merging with user-specified desired properties. All unspecified keys default to `false`.
+ * Used as the base for merging with user-specified desired properties. All unspecified keys inherit these defaults.
  */
 export const desiredPropertiesMinimal = Discordeno.createDesiredPropertiesObject({
   channel: {
@@ -103,35 +103,41 @@ export interface DDBotDesiredMinimalProperties extends Required<typeof desiredPr
 /**
  * Recursively fills missing keys in the user-provided desired properties object with defaults from the minimal desired properties.
  *
- * Any unspecified key will be set to `false`.
+ * Any unspecified key inherits the value from the minimal schema, ensuring required cache fields remain enabled.
  *
  * @param userProps - The user-specified desired properties (may be partial).
  * @param allProps - The schema of all possible properties (usually `desiredPropertiesMinimal`).
- * @returns The merged properties object with all missing keys set to `false`.
+ * @returns The merged properties object with all missing keys populated from the minimal defaults.
  */
-function fillDefaults<T extends object>(userProps: T, allProps: Record<string, unknown>): T & Record<string, false> {
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function fillDefaults<T extends object>(userProps: T, allProps: Record<string, unknown>): T & Record<string, unknown> {
   const result: Record<string, unknown> = {};
-  for (const key in allProps) {
-    if (!Object.prototype.hasOwnProperty.call(allProps, key)) continue;
-    const userValue = (userProps as Record<string, unknown>)[key];
-    const allValue = allProps[key];
-    if (typeof allValue === 'object' && allValue !== null && !Array.isArray(allValue)) {
+  const userRecord = userProps as Record<string, unknown>;
+
+  for (const [key, allValue] of Object.entries(allProps)) {
+    const userHasKey = Object.prototype.hasOwnProperty.call(userRecord, key);
+    const userValue = userRecord[key];
+
+    if (isPlainObject(allValue)) {
       result[key] = fillDefaults(
-        typeof userValue === 'object' && userValue !== null ? userValue : {},
-        allValue as Record<string, unknown>,
+        userHasKey && isPlainObject(userValue) ? (userValue as Record<string, unknown>) : {},
+        allValue,
       );
     } else {
-      result[key] = key in userProps ? userValue : false;
+      result[key] = userHasKey ? userValue : allValue;
     }
   }
-  // Also copy any user keys not in allProps
-  for (const key in userProps as Record<string, unknown>) {
-    if (!Object.prototype.hasOwnProperty.call(userProps, key)) continue;
+
+  for (const [key, value] of Object.entries(userRecord)) {
     if (!(key in result)) {
-      result[key] = (userProps as Record<string, unknown>)[key];
+      result[key] = value;
     }
   }
-  return result as T & Record<string, false>;
+
+  return result as T & Record<string, unknown>;
 }
 
 /**
@@ -149,7 +155,7 @@ type OptionalDesiredProperties<T> = {
 /**
  * Creates the desired properties object for DDFramework by merging user config with minimal defaults.
  *
- * All unspecified keys will default to `false`.
+ * All unspecified keys inherit the minimal defaults (e.g. required cache identifiers remain enabled).
  *
  * @param userProperties - The user-specified desired properties (may be partial).
  * @returns The merged desired properties object with all keys present and missing keys set to `false`.
@@ -157,7 +163,7 @@ type OptionalDesiredProperties<T> = {
 export function createDDFrameworkProperties<T extends object>(
   userProperties: OptionalDesiredProperties<T>,
 ): T & typeof desiredPropertiesMinimal {
-  // Fill missing keys with false, using desiredPropertiesMinimal as the schema
+  // Fill missing keys using desiredPropertiesMinimal as the schema so required cache fields stay enabled
   return fillDefaults(userProperties, desiredPropertiesMinimal) as T & typeof desiredPropertiesMinimal;
 }
 

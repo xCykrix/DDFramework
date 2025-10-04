@@ -38,10 +38,10 @@ framework.leaf.linkLeaf({
       botRequiredChannelPermissions: [],
       userRequiredChannelPermissions: [],
     },
-    developerRequired: true,
+    developerRequired: false,
     channelTypesRequired: [Discordeno.ChannelTypes.GuildText],
     components: {
-      acceptedBaseCustomIds: [''],
+      acceptedBaseCustomIds: [],
       requireStatePacket: true,
       restrictToAuthor: true,
     },

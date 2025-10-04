@@ -1,3 +1,5 @@
+import { ExpirationManager } from './expirationManager.ts';
+
 /**
  * A Map-like collection where entries automatically expire after a specified time.
  *
@@ -10,14 +12,18 @@
  *   expMap.set('bar', 99, 10000); // expires in 10 seconds
  */
 export class MapWithExpiration<K, V> implements Iterable<[K, V]> {
-  private items = new Map<K, V>();
-  private timers = new Map<K, ReturnType<typeof setTimeout>>();
+  private readonly items = new Map<K, V>();
+  private readonly expirations: ExpirationManager<K>;
 
   /**
    * Create a new MapWithExpiration.
    * @param defaultExpirationMs Default expiration time in milliseconds for entries added.
    */
-  public constructor(private defaultExpirationMs: number) {}
+  public constructor(defaultExpirationMs: number) {
+    this.expirations = new ExpirationManager<K>(defaultExpirationMs, (key) => {
+      this.items.delete(key);
+    });
+  }
 
   /**
    * Add or update an entry, with optional custom expiration time.
@@ -28,12 +34,8 @@ export class MapWithExpiration<K, V> implements Iterable<[K, V]> {
    * @returns The map instance (for chaining).
    */
   public set(key: K, value: V, expirationMs?: number): this {
-    if (this.items.has(key)) {
-      this.clearTimer(key);
-    }
     this.items.set(key, value);
-    const ms = expirationMs ?? this.defaultExpirationMs;
-    this.timers.set(key, setTimeout(() => this.delete(key), ms));
+    this.expirations.schedule(key, expirationMs);
     return this;
   }
 
@@ -43,7 +45,7 @@ export class MapWithExpiration<K, V> implements Iterable<[K, V]> {
    * @returns True if the entry was present and removed, false otherwise.
    */
   public delete(key: K): boolean {
-    this.clearTimer(key);
+    this.expirations.cancel(key);
     return this.items.delete(key);
   }
 
@@ -76,9 +78,7 @@ export class MapWithExpiration<K, V> implements Iterable<[K, V]> {
    * Remove all entries and cancel all expiration timers.
    */
   public clear(): void {
-    for (const key of this.items.keys()) {
-      this.clearTimer(key);
-    }
+    this.expirations.clear();
     this.items.clear();
   }
 
@@ -87,15 +87,5 @@ export class MapWithExpiration<K, V> implements Iterable<[K, V]> {
    */
   public [Symbol.iterator](): Iterator<[K, V]> {
     return this.items[Symbol.iterator]();
-  }
-
-  /**
-   * Cancel the expiration timer for a specific key, if present.
-   * @param key The key whose timer should be cleared.
-   */
-  private clearTimer(key: K): void {
-    const timer = this.timers.get(key);
-    if (timer) clearTimeout(timer);
-    this.timers.delete(key);
   }
 }

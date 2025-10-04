@@ -1,3 +1,5 @@
+import { ExpirationManager } from './expirationManager.ts';
+
 /**
  * A Set-like collection where items automatically expire after a specified time.
  *
@@ -10,14 +12,18 @@
  *   expSet.add('bar', 10000); // expires in 10 seconds
  */
 export class SetWithExpiration<T> implements Iterable<T> {
-  private items = new Set<T>();
-  private timers = new Map<T, ReturnType<typeof setTimeout>>();
+  private readonly items = new Set<T>();
+  private readonly expirations: ExpirationManager<T>;
 
   /**
    * Create a new SetWithExpiration.
    * @param defaultExpirationMs Default expiration time in milliseconds for items added.
    */
-  public constructor(private defaultExpirationMs: number) {}
+  public constructor(defaultExpirationMs: number) {
+    this.expirations = new ExpirationManager<T>(defaultExpirationMs, (item) => {
+      this.items.delete(item);
+    });
+  }
 
   /**
    * Add an item to the set, with optional custom expiration time.
@@ -27,12 +33,8 @@ export class SetWithExpiration<T> implements Iterable<T> {
    * @returns The set instance (for chaining).
    */
   public add(item: T, expirationMs?: number): this {
-    if (this.items.has(item)) {
-      this.clearTimer(item);
-    }
     this.items.add(item);
-    const ms = expirationMs ?? this.defaultExpirationMs;
-    this.timers.set(item, setTimeout(() => this.delete(item), ms));
+    this.expirations.schedule(item, expirationMs);
     return this;
   }
 
@@ -42,7 +44,7 @@ export class SetWithExpiration<T> implements Iterable<T> {
    * @returns True if the item was present and removed, false otherwise.
    */
   public delete(item: T): boolean {
-    this.clearTimer(item);
+    this.expirations.cancel(item);
     return this.items.delete(item);
   }
 
@@ -66,9 +68,7 @@ export class SetWithExpiration<T> implements Iterable<T> {
    * Remove all items from the set and cancel all expiration timers.
    */
   public clear(): void {
-    for (const item of this.items) {
-      this.clearTimer(item);
-    }
+    this.expirations.clear();
     this.items.clear();
   }
 
@@ -77,15 +77,5 @@ export class SetWithExpiration<T> implements Iterable<T> {
    */
   public [Symbol.iterator](): Iterator<T> {
     return this.items[Symbol.iterator]();
-  }
-
-  /**
-   * Cancel the expiration timer for a specific item, if present.
-   * @param item The item whose timer should be cleared.
-   */
-  private clearTimer(item: T): void {
-    const timer = this.timers.get(item);
-    if (timer) clearTimeout(timer);
-    this.timers.delete(item);
   }
 }

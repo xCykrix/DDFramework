@@ -7,7 +7,7 @@ export * as DiscordJSBuilders from 'npm:@discordjs/builders@2.0.0-dev.1759363313
 
 export * as deepMerge from 'jsr:@cross/deepmerge@1.0.0';
 
-export { } from 'jsr:@std/fs@1.0.19';
+import 'jsr:@std/fs@1.0.19';
 
 export {
   decodeTime,

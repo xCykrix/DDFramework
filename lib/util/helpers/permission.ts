@@ -3,9 +3,19 @@ import type { DDFramework, DDFrameworkInternal } from '../../../mod.ts';
 import type { DDFrameworkDesiredProperties } from '../../desired.ts';
 import type { BotWithCacheProxy } from '../client.ts';
 
+/**
+ * Permissions utility class for calculating and validating Discord permissions in DDFramework.
+ *
+ * @typeParam T - The desired properties type for the bot instance.
+ */
 export class Permissions<T extends DDFrameworkDesiredProperties> {
   private framework!: DDFramework<DDFrameworkDesiredProperties>;
 
+  /**
+   * Create an instance of Permissions utility.
+   *
+   * @param framework - The DDFramework instance to use for permission calculations.
+   */
   public constructor(framework: DDFramework<T>) {
     // Cast to general DDFramework type to access internal structures
     this.framework = framework as unknown as DDFrameworkInternal;
@@ -13,9 +23,10 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Calculates the base permissions for a member in a guild.
-   * @param guild The guild.
-   * @param member The member.
-   * @returns The base permissions.
+   *
+   * @param guild - The guild.
+   * @param member - The member.
+   * @returns The base permissions as a bigint bitfield.
    */
   public calculateBasePermissions(
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
@@ -37,10 +48,11 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Calculates the channel overwrites for a member in a channel.
-   * @param guild The guild.
-   * @param channelId The channel ID.
-   * @param member The member.
-   * @returns The channel overwrites.
+   *
+   * @param guild - The guild.
+   * @param channelId - The channel ID.
+   * @param member - The member.
+   * @returns The channel overwrites as a bigint bitfield.
    */
   public calculateCachedChannelOverwrites(
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
@@ -90,10 +102,11 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Calculates the channel overwrites for a role in a channel.
-   * @param guild The guild.
-   * @param channelId The channel ID.
-   * @param roleId The role ID.
-   * @returns The channel overwrites for the role.
+   *
+   * @param guild - The guild.
+   * @param channelId - The channel ID.
+   * @param roleId - The role ID.
+   * @returns The channel overwrites for the role as a bigint bitfield.
    */
   public calculateCachedChannelOverwritesForRole(
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
@@ -145,9 +158,10 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Gets the missing permissions from a set of permission bits.
-   * @param permissionBits The permission bits.
-   * @param permissions The permissions to check.
-   * @returns An array of missing permissions.
+   *
+   * @param permissionBits - The permission bits as a bigint bitfield.
+   * @param permissions - The permissions to check.
+   * @returns An array of missing permission strings.
    */
   public getMissingPerms(permissionBits: bigint, permissions: Discordeno.PermissionStrings[]): string[] {
     if (permissionBits & BigInt(Discordeno.BitwisePermissionFlags.ADMINISTRATOR)) return [];
@@ -162,8 +176,9 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Validates if the given permission bits match the given permissions.
-   * @param permissionBits The permission bits.
-   * @param permissions The permissions to validate.
+   *
+   * @param permissionBits - The permission bits as a bigint bitfield.
+   * @param permissions - The permissions to validate.
    * @returns True if the permissions are valid, false otherwise.
    */
   public validatePermissions(permissionBits: bigint, permissions: Discordeno.PermissionStrings[]): boolean {
@@ -178,9 +193,10 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Checks if a member has the specified permissions in a guild.
-   * @param guild The guild.
-   * @param member The member.
-   * @param permissions The permissions to check.
+   *
+   * @param guild - The guild.
+   * @param member - The member.
+   * @param permissions - The permissions to check.
    * @returns True if the member has the permissions, false otherwise.
    */
   public hasGuildPermissions(
@@ -194,10 +210,11 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Checks if a member has the specified permissions in a channel.
-   * @param guild The guild.
-   * @param channelId The channel ID.
-   * @param member The member.
-   * @param permissions The permissions to check.
+   *
+   * @param guild - The guild.
+   * @param channelId - The channel ID.
+   * @param member - The member.
+   * @param permissions - The permissions to check.
    * @returns True if the member has the permissions, false otherwise.
    */
   public hasChannelPermissions(
@@ -212,10 +229,11 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Gets the missing permissions from a member in a guild.
-   * @param guild The guild.
-   * @param member The member.
-   * @param permissions The permissions to check.
-   * @returns An array of missing permissions.
+   *
+   * @param guild - The guild.
+   * @param member - The member.
+   * @param permissions - The permissions to check.
+   * @returns An array of missing permission strings.
    */
   public getMissingGuildPermissions<T extends Discordeno.PermissionStrings>(
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
@@ -228,11 +246,12 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Gets the missing permissions from a member in a channel.
-   * @param guild The guild.
-   * @param channelId The channel ID.
-   * @param member The member.
-   * @param permissions The permissions to check.
-   * @returns An array of missing permissions.
+   *
+   * @param guild - The guild.
+   * @param channelId - The channel ID.
+   * @param member - The member.
+   * @param permissions - The permissions to check.
+   * @returns An array of missing permission strings.
    */
   public getMissingChannelPermissions<T extends Discordeno.PermissionStrings>(
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
@@ -245,7 +264,11 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
   }
 
   /**
-   * Returns the permissions that are not in the given permissionBits
+   * Returns the permissions that are not present in the given permissionBits.
+   *
+   * @param permissionBits - The permission bits as a bigint bitfield.
+   * @param permissions - The permissions to check.
+   * @returns An array of missing permission strings.
    */
   public missingPermissions<T extends Discordeno.PermissionStrings>(permissionBits: bigint, permissions: T[]): Discordeno.PermissionStrings[] {
     if (permissionBits & 8n) return [];
@@ -254,8 +277,9 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
   }
 
   /**
-   * Converts a bitwise string to an array of permission strings.
-   * @param permissionBits The bitwise string.
+   * Converts a bitwise permission bits value to an array of permission strings.
+   *
+   * @param permissionBits - The permission bits as a bigint bitfield.
    * @returns An array of permission strings.
    */
   public calculatePermissions(permissionBits: bigint): string[] {
@@ -270,8 +294,9 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Converts an array of permission strings to a bitwise string.
-   * @param permissions The array of permission strings.
-   * @returns The bitwise string.
+   *
+   * @param permissions - The array of permission strings.
+   * @returns The bitwise string representation.
    */
   public calculateBits(permissions: Discordeno.PermissionStrings[]): string {
     return permissions.reduce((bits, perm) => bits | BigInt(Discordeno.BitwisePermissionFlags[perm] ?? 0), 0n).toString();
@@ -279,8 +304,9 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Gets the highest role of a member in a guild.
-   * @param guild The guild.
-   * @param member The member.
+   *
+   * @param guild - The guild.
+   * @param member - The member.
    * @returns The highest role or undefined if the member has no roles.
    */
   public highestRole(
@@ -306,9 +332,10 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Checks if the first role has a higher position than the second role.
-   * @param guild The guild.
-   * @param roleId The ID of the first role.
-   * @param otherRoleId The ID of the second role.
+   *
+   * @param guild - The guild.
+   * @param roleId - The ID of the first role.
+   * @param otherRoleId - The ID of the second role.
    * @returns True if the first role is higher, false otherwise.
    */
   public higherRolePosition(
@@ -326,9 +353,10 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
 
   /**
    * Checks if a member has a higher role position than the given role ID.
-   * @param guild The guild.
-   * @param member The member.
-   * @param compareRoleId The role ID to compare with.
+   *
+   * @param guild - The guild.
+   * @param member - The member.
+   * @param compareRoleId - The role ID to compare with.
    * @returns True if the member has a higher role position, false otherwise.
    */
   public isHigherPosition(

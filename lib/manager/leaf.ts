@@ -1,152 +1,13 @@
-import { Discordeno } from '../../deps.ts';
-import type { DDBotInternal, DDFrameworkInternal } from '../../mod.ts';
+import { deepMerge, Discordeno } from '../../deps.ts';
+import type { DDFrameworkInternal } from '../../mod.ts';
 import type { DDFrameworkOptions } from '../options.ts';
 import { injectChatInputHandler } from '../util/internal/event/chatInputHandler.ts';
-
-/** Base Shape for any Option */
-export interface BaseOption<T extends Discordeno.ApplicationCommandOptionTypes> extends Omit<Discordeno.ApplicationCommandOption, 'nameLocalizations' | 'descriptionLocalizations'> {
-  type: T;
-}
-
-/** SubCommand */
-export interface SubCommandOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.SubCommand> {
-  options?: Option[];
-}
-
-/** SubCommand Group */
-export interface SubCommandGroupOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.SubCommandGroup> {
-  options: SubCommandOption[];
-}
-
-/** Leaf Option Types */
-export interface StringOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.String> {}
-export interface IntegerOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Integer> {}
-export interface NumberOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Number> {}
-export interface BooleanOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Boolean> {}
-export interface UserOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.User> {}
-export interface ChannelOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Channel> {}
-export interface RoleOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Role> {}
-export interface MentionableOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Mentionable> {}
-
-/** Union of every possible Option */
-export type Option =
-  | SubCommandGroupOption
-  | SubCommandOption
-  | StringOption
-  | IntegerOption
-  | NumberOption
-  | BooleanOption
-  | UserOption
-  | ChannelOption
-  | RoleOption
-  | MentionableOption;
-
-/** Map Discord option types to TS primitives */
-export type LeafTypeMap = {
-  [Discordeno.ApplicationCommandOptionTypes.String]: string;
-  [Discordeno.ApplicationCommandOptionTypes.Integer]: number;
-  [Discordeno.ApplicationCommandOptionTypes.Boolean]: boolean;
-  [Discordeno.ApplicationCommandOptionTypes.User]: DDBotInternal['transformers']['$inferredTypes']['user'];
-  [Discordeno.ApplicationCommandOptionTypes.Channel]: DDBotInternal['transformers']['$inferredTypes']['channel'];
-  [Discordeno.ApplicationCommandOptionTypes.Role]: DDBotInternal['transformers']['$inferredTypes']['role'];
-  [Discordeno.ApplicationCommandOptionTypes.Mentionable]: DDBotInternal['transformers']['$inferredTypes']['user'] | DDBotInternal['transformers']['$inferredTypes']['role'];
-  [Discordeno.ApplicationCommandOptionTypes.Number]: number;
-};
-
-/** Recursively extract `{ name: value }` from an options array */
-export type ExtractArgsFromOptions<
-  T extends readonly Option[] | undefined,
-> = T extends readonly Option[] ? {
-    [O in T[number] as O['name']]: O extends SubCommandGroupOption ? {
-        [G in O['options'][number] as G['name']]: ExtractArgsFromOptions<G['options']>;
-      }
-      : O extends SubCommandOption ? ExtractArgsFromOptions<O['options']>
-      : O extends { type: infer U } ? U extends keyof LeafTypeMap ? O['required'] extends true ? LeafTypeMap[U]
-          : LeafTypeMap[U] | undefined
-        : never
-      : never;
-  }
-  : Record<PropertyKey, never>;
-
-/** Full ChatInput Command JSON shape */
-export interface ChatInputCommandJSON {
-  type: Discordeno.ApplicationCommandTypes.ChatInput;
-  name: string;
-  description: string;
-  options?: readonly Option[];
-}
-
-/** Final argument type for a given command definition */
-export type ChatInputArgs<C extends ChatInputCommandJSON> = ExtractArgsFromOptions<C['options']>;
-
-/** Auto Complete Response */
-export type AutoCompleteResponse = {
-  results: Discordeno.ApplicationCommandOptionChoice[];
-  perPage?: number;
-  allowEmptySearch?: boolean;
-};
-
-/** Dynamic handler type for processing. */
-export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
-  callback<T extends ChatInputArgs<V>>(passthrough: {
-    interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];
-    guild?: DDBotInternal['cache']['$inferredTypes']['guild'];
-    member?: DDBotInternal['cache']['$inferredTypes']['member'];
-    botMember?: DDBotInternal['cache']['$inferredTypes']['member'];
-    args: T;
-  }): Promise<void>;
-  autocomplete?<T extends Discordeno.InteractionDataOption>(passthrough: {
-    interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];
-    focused: T;
-  }): Promise<AutoCompleteResponse | null>;
-  component?<Z>(passthrough: {
-    interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];
-    baseCustomId: string;
-    parsedModal: Map<string, string> | null;
-    statePacket: Z | null;
-  }): Promise<void>;
-};
-
-export type HandlerOptions = {
-  // Access Control
-  guildRequired: boolean;
-  developerRequired: boolean;
-  channelTypesRequired: (Discordeno.ChannelTypes.GuildAnnouncement | Discordeno.ChannelTypes.GuildText | Discordeno.ChannelTypes.GuildForum | Discordeno.ChannelTypes.GuildMedia | Discordeno.ChannelTypes.DM | Discordeno.ChannelTypes.GroupDm)[];
-
-  // Bot Permissions
-  botRequiredGuildPermissions: Discordeno.PermissionStrings[];
-  botRequiredChannelPermissions: Discordeno.PermissionStrings[];
-
-  // User Permissions
-  userRequiredGuildPermissions: Discordeno.PermissionStrings[];
-  userRequiredChannelPermissions: Discordeno.PermissionStrings[];
-
-  // Components
-  components?: {
-    acceptedBaseCustomIds: string[];
-    requireStatePacket: boolean;
-    restrictToAuthor: boolean;
-  };
-};
-
-export type HandlerPassthrough<Z extends ChatInputCommandJSON, T = ChatInputArgs<Z>> = {
-  interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];
-  guild?: DDBotInternal['cache']['$inferredTypes']['guild'];
-  member?: DDBotInternal['cache']['$inferredTypes']['member'];
-  botMember?: DDBotInternal['cache']['$inferredTypes']['member'];
-  args: T;
-};
-
-export interface LeafDefinition<T extends ChatInputCommandJSON> {
-  schema: T;
-  options: HandlerOptions;
-  handler: DynamicInjectedHandler<T>;
-}
+import { mergeChatInputJSON } from '../util/object/mergeChatInputJSON.ts';
+import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, Option } from './leaf.types.ts';
 
 /**
- * Leaf Manager for managing the internal leaf structure.
+ * Leaf Manager for managing command, component, and autocomplete leaf nodes in DDFramework.
  *
- * @private
  * @remarks This class is used internally by DDFramework and is not intended for direct initialization by end-users.
  */
 export class LeafManager {
@@ -154,10 +15,23 @@ export class LeafManager {
   private options: DDFrameworkOptions;
 
   /**
+   * Map of command names to their registered command schemas.
+   */
+  public linkedSchemas: Map<string, ChatInputCommandJSON> = new Map();
+  /**
+   * Map of command/component paths to their handler options.
+   */
+  public linkedOptions: Map<string, HandlerOptions> = new Map();
+  /**
+   * Map of command/component paths to their dynamic handler implementations.
+   */
+  public linkedDynamics: Map<string, DynamicInjectedHandler<ChatInputCommandJSON>> = new Map();
+
+  /**
    * Create an instance of LeafManager.
    *
-   * @param framework The bot instance to manage leaves for.
-   * @param options The options for the leaf manager.
+   * @param framework - The bot instance to manage leaves for.
+   * @param options - The options for the leaf manager.
    */
   public constructor(framework: DDFrameworkInternal, options: DDFrameworkOptions) {
     this.framework = framework;
@@ -171,17 +45,94 @@ export class LeafManager {
 
     // Initialize Autocomplete Handler Leaf Autocomplete
     // ...
+
+    // Initialize Built-in Ready Event
+    this.framework._internal_events.add('ready', async (v) => {
+      for (const guild of v.guilds) {
+        await this.framework.internal.helpers.upsertGuildApplicationCommands(guild, this.linkedSchemas.values().toArray() as Discordeno.CreateApplicationCommand[]).catch((e) => {
+          this.options.errorHandler(
+            new Deno.errors.InvalidData(`[DDFramework:LeafManager] Failed to upsert linkedSchemas to guild ${guild}: ${e.message}`),
+          );
+        });
+      }
+    });
   }
 
   /**
-   * Register a leaf definition.
+   * Register a leaf definition (command/component/autocomplete handler).
    *
-   * @param definition The leaf definition to register.
-   * @returns The registered leaf definition.
+   * @typeParam T - The command schema type.
+   * @param definition - The leaf definition to register.
    */
-  public registerLeaf<T extends ChatInputCommandJSON>(
-    definition: LeafDefinition<T>,
-  ): void {
-    // Implementation for registering the leaf definition
+  public linkLeaf<T extends ChatInputCommandJSON>(definition: LeafDefinition<T>): void {
+    const commandPaths = new Set<string>([definition.schema.name]);
+    for (const path of this.getDynamicPath(definition.schema.name, definition.schema.options)) {
+      commandPaths.add(path);
+    }
+
+    for (const path of commandPaths) {
+      this.registerLink(path, definition);
+    }
+
+    const componentIds = definition.options.components?.acceptedBaseCustomIds ?? [];
+    for (const componentPath of componentIds) {
+      this.registerLink(componentPath, definition);
+    }
+
+    if (!this.linkedSchemas.has(definition.schema.name)) {
+      this.linkedSchemas.set(definition.schema.name, definition.schema);
+    } else {
+      const merge = deepMerge.deepMerge.withOptions<ChatInputCommandJSON>(
+        {
+          arrayMergeStrategy: 'unique',
+          setMergeStrategy: 'combine',
+          mapMergeStrategy: 'combine',
+          customMergeFunctions: {
+            Array: mergeChatInputJSON,
+          },
+        },
+        this.linkedSchemas.get(definition.schema.name)!,
+        definition.schema,
+      );
+      this.linkedSchemas.set(definition.schema.name, merge);
+    }
+  }
+
+  /**
+   * Recursively get dynamic command/component paths from options.
+   *
+   * @param base - The base path to start from.
+   * @param options - The options to extract paths from.
+   * @returns An array of dynamic paths.
+   */
+  private getDynamicPath(
+    base: string,
+    options?: readonly Option[],
+  ): string[] {
+    if (!options) return [];
+    const paths: string[] = [];
+    for (const option of options) {
+      // Only include if type is ChatInput, SubCommand, or SubCommandGroup
+      if (
+        option.type === Discordeno.ApplicationCommandOptionTypes.SubCommand ||
+        option.type === Discordeno.ApplicationCommandOptionTypes.SubCommandGroup
+      ) {
+        const currentPath = `${base}.${option.name}`;
+        paths.push(currentPath);
+        if ('options' in option && Array.isArray(option.options)) {
+          paths.push(...this.getDynamicPath(currentPath, option.options));
+        }
+      }
+    }
+    return paths;
+  }
+
+  /**
+   * Register a dynamic path or component identifier with its handler and options.
+   */
+  private registerLink<T extends ChatInputCommandJSON>(path: string, definition: LeafDefinition<T>): void {
+    this.linkedDynamics.set(path, definition.handler as DynamicInjectedHandler<ChatInputCommandJSON>);
+    this.linkedOptions.set(path, definition.options);
   }
 }
+export type { AutoCompleteResponse, BaseOption, BooleanOption, ChannelOption, ChatInputArgs, ChatInputCommandJSON, DynamicInjectedHandler, ExtractArgsFromOptions, HandlerOptions, HandlerPassthrough, IntegerOption, LeafDefinition, LeafTypeMap, MentionableOption, NumberOption, Option, RoleOption, StringOption, SubCommandGroupOption, SubCommandOption, UserOption } from './leaf.types.ts';

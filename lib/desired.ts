@@ -1,6 +1,14 @@
 import { Discordeno } from '../deps.ts';
 
-// Define the minimum required properties your framework needs
+/**
+ * Minimal desired properties for DDFramework.
+ *
+ * This object defines the default set of properties that will be available on all entities
+ * unless explicitly overridden in user configuration. Properties not specified will default to `false`.
+ *
+ * @remarks
+ * Used as the base for merging with user-specified desired properties. All unspecified keys default to `false`.
+ */
 export const desiredPropertiesMinimal = Discordeno.createDesiredPropertiesObject({
   channel: {
     id: true,
@@ -85,41 +93,86 @@ export const desiredPropertiesMinimal = Discordeno.createDesiredPropertiesObject
     toggles: true,
   },
 });
+/**
+ * Interface representing the minimal desired properties required by DDFramework.
+ *
+ * Extends all keys in `desiredPropertiesMinimal` as required.
+ */
+export interface DDBotDesiredMinimalProperties extends Required<typeof desiredPropertiesMinimal> {}
 
-// Make all desired properties optional at the type level
-type OptionalDesiredProperties<T> = {
-  [K in keyof T]?: T[K] extends Discordeno.TransformersDesiredProperties ? OptionalDesiredProperties<T[K]> : T[K];
-};
-
-// Utility function to merge user properties with required ones
-export function createDDFrameworkProperties<T extends Discordeno.TransformersDesiredProperties>(
-  userProperties: OptionalDesiredProperties<T>,
-): T & typeof desiredPropertiesMinimal {
-  const result = {
-    ...desiredPropertiesMinimal,
-    ...userProperties,
-  } as T & typeof desiredPropertiesMinimal;
-
-  // Automatically merge all first-level objects from desiredPropertiesMinimal
-  const minimalKeys = Object.keys(desiredPropertiesMinimal) as (keyof typeof desiredPropertiesMinimal)[];
-
-  for (const key of minimalKeys) {
-    const minimalValue = desiredPropertiesMinimal[key];
-    const userValue = (userProperties as Record<string | symbol, unknown>)[key];
-
-    if (typeof minimalValue === 'object' && minimalValue !== null) {
-      (result as Record<string | symbol, unknown>)[key] = {
-        ...minimalValue,
-        ...(typeof userValue === 'object' && userValue !== null ? userValue : {}),
-      };
+/**
+ * Recursively fills missing keys in the user-provided desired properties object with defaults from the minimal desired properties.
+ *
+ * Any unspecified key will be set to `false`.
+ *
+ * @param userProps - The user-specified desired properties (may be partial).
+ * @param allProps - The schema of all possible properties (usually `desiredPropertiesMinimal`).
+ * @returns The merged properties object with all missing keys set to `false`.
+ */
+function fillDefaults<T extends object>(userProps: T, allProps: Record<string, unknown>): T & Record<string, false> {
+  const result: Record<string, unknown> = {};
+  for (const key in allProps) {
+    if (!Object.prototype.hasOwnProperty.call(allProps, key)) continue;
+    const userValue = (userProps as Record<string, unknown>)[key];
+    const allValue = allProps[key];
+    if (typeof allValue === 'object' && allValue !== null && !Array.isArray(allValue)) {
+      result[key] = fillDefaults(
+        typeof userValue === 'object' && userValue !== null ? userValue : {},
+        allValue as Record<string, unknown>,
+      );
+    } else {
+      result[key] = key in userProps ? userValue : false;
     }
   }
-
-  return result;
+  // Also copy any user keys not in allProps
+  for (const key in userProps as Record<string, unknown>) {
+    if (!Object.prototype.hasOwnProperty.call(userProps, key)) continue;
+    if (!(key in result)) {
+      result[key] = (userProps as Record<string, unknown>)[key];
+    }
+  }
+  return result as T & Record<string, false>;
 }
 
-// Type alias for the minimal properties for easier use
+/**
+ * Type representing the desired properties for DDFramework.
+ *
+ * All properties are optional and default to `false` if not specified.
+ * This type is recursively applied to nested objects.
+ *
+ * @template T - The base properties type to make optional.
+ */
+type OptionalDesiredProperties<T> = {
+  [K in keyof T]?: T[K] extends object ? OptionalDesiredProperties<T[K]> : T[K];
+};
+
+/**
+ * Creates the desired properties object for DDFramework by merging user config with minimal defaults.
+ *
+ * All unspecified keys will default to `false`.
+ *
+ * @param userProperties - The user-specified desired properties (may be partial).
+ * @returns The merged desired properties object with all keys present and missing keys set to `false`.
+ */
+export function createDDFrameworkProperties<T extends object>(
+  userProperties: OptionalDesiredProperties<T>,
+): T & typeof desiredPropertiesMinimal {
+  // Fill missing keys with false, using desiredPropertiesMinimal as the schema
+  return fillDefaults(userProperties, desiredPropertiesMinimal) as T & typeof desiredPropertiesMinimal;
+}
+
+/**
+ * Type alias for the minimal desired properties for easier use.
+ *
+ * @see desiredPropertiesMinimal
+ */
 export type MinimalDesiredProperties = typeof desiredPropertiesMinimal;
 
-// Type that ensures T includes the minimal properties
+/**
+ * Type that ensures T includes the minimal properties required by DDFramework.
+ *
+ * This type is used to guarantee that user-specified properties always include the framework's defaults.
+ *
+ * @template T - The user-specified desired properties type.
+ */
 export type DDFrameworkDesiredProperties<T extends Discordeno.TransformersDesiredProperties = MinimalDesiredProperties> = T & MinimalDesiredProperties;

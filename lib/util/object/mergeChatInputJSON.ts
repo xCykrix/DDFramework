@@ -1,9 +1,23 @@
 import { deepMerge } from '../../../deps.ts';
 
-const mergeChatInputJSON = (a: any[], b: any[]): any[] => {
+/** Represents a single chat input option. */
+type ChatInputOption = { name?: string; [key: string]: unknown };
+
+/**
+ * Custom merge function to intelligently merge arrays of ChatInputCommandJSON options.
+ *
+ * - Merges options by their `name` property.
+ * - Recursively merges nested options.
+ * - Combines unique options and preserves unnamed options.
+ *
+ * @param a The first array of ChatInputCommandJSON options.
+ * @param b The second array of ChatInputCommandJSON options.
+ * @returns The merged array of ChatInputCommandJSON options.
+ */
+export function mergeChatInputJSON(a: ChatInputOption[], b: ChatInputOption[]): ChatInputOption[] {
   if (!Array.isArray(a) || !Array.isArray(b)) return b ?? a;
-  const mergedOptions: typeof a = [];
-  const map = new Map<string, any>();
+  const mergedOptions: ChatInputOption[] = [];
+  const map = new Map<string, ChatInputOption>();
 
   // Index all options from 'a' by name
   for (const opt of a) {
@@ -28,7 +42,7 @@ const mergeChatInputJSON = (a: any[], b: any[]): any[] => {
               mapMergeStrategy: 'combine',
               customMergeFunctions: { Array: mergeChatInputJSON },
             },
-            map.get(opt.name),
+            map.get(opt.name) ?? {},
             opt,
           ),
         );
@@ -42,4 +56,4 @@ const mergeChatInputJSON = (a: any[], b: any[]): any[] => {
 
   // Combine merged named options and unnamed ones
   return [...map.values(), ...mergedOptions];
-};
+}

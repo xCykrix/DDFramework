@@ -13,6 +13,9 @@ export type DDFrameworkOptions = {
   /** The token used for authentication. */
   token: string;
 
+  /** Authorized Developers for Restricted Interactions */
+  developers: string[];
+
   /** Error Handler */
   errorHandler: (error: Error | string) => void;
 };

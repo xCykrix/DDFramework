@@ -1,4 +1,4 @@
-import { Discordeno, type DiscordJSBuilders } from '../../../deps.ts';
+import { Discordeno, DiscordJSBuilders } from '../../../deps.ts';
 
 /**
  * Coerces a DiscordJSBuilders ContainerBuilder into Discordeno MessageComponents.
@@ -30,4 +30,38 @@ export function fastComponentV2(components: Discordeno.MessageComponents | Disco
     flags: Discordeno.MessageFlags.IsComponentsV2,
     components: components as Discordeno.MessageComponents,
   };
+}
+
+export function fastGenericComponentV2(
+  parts: {
+    title?: string;
+    content: string;
+    color?: number;
+  } | {
+    title: string;
+    content?: string;
+    color?: number;
+  },
+): {
+  flags: Discordeno.MessageFlags.IsComponentsV2;
+  components: Discordeno.MessageComponents;
+} {
+  const builder = new DiscordJSBuilders.ContainerBuilder()
+    .setAccentColor(parts.color ?? 0x5865F2); // #5865F2
+  if (parts.title !== undefined) {
+    builder.addTextDisplayComponents((b) => b.setContent(parts.title ?? 'Invalid Title (Report to Developer)'));
+    builder.addSeparatorComponents((b) => b.setSpacing(Discordeno.SeparatorSpacingSize.Small));
+  }
+  if (parts.content !== undefined) {
+    builder.addTextDisplayComponents((b) => b.setContent(parts.content ?? 'Invalid Response (Report to Developer)'));
+    builder.addSeparatorComponents((b) => b.setSpacing(Discordeno.SeparatorSpacingSize.Small));
+  }
+  builder
+    .addTextDisplayComponents((b) => b.setContent(parts.content ?? 'No content provided'))
+    .addSeparatorComponents((b) => b.setSpacing(Discordeno.SeparatorSpacingSize.Small))
+    .addTextDisplayComponents((b) => b.setContent(`-# <t:${Math.floor(Date.now() / 1000)}:F>`));
+
+  return fastComponentV2(
+    builder,
+  );
 }

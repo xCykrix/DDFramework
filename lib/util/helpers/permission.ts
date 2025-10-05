@@ -1,16 +1,35 @@
 import { Discordeno } from '../../../deps.ts';
 import type { DDFramework, DDFrameworkInternal } from '../../../mod.ts';
-import type { DDFrameworkDesiredProperties } from '../../desired.ts';
 import type { BotWithCacheProxy } from '../../client.ts';
+import type { DDFrameworkDesiredProperties } from '../../desired.ts';
 
+/**
+ * Set of Discord channel types that are considered threads.
+ * Used for thread-specific permission calculations, e.g. SEND_MESSAGES_IN_THREADS.
+ *
+ * @internal
+ */
 const THREAD_CHANNEL_TYPES = new Set([
   Discordeno.ChannelTypes.AnnouncementThread,
   Discordeno.ChannelTypes.PrivateThread,
   Discordeno.ChannelTypes.PublicThread,
 ]);
 
+/**
+ * Tuple type returned by Discordeno.separateOverwrites.
+ * Used for permission overwrite calculations in channel context.
+ *
+ * @internal
+ */
 type OverwriteTuple = ReturnType<typeof Discordeno.separateOverwrites>;
 
+/**
+ * Context object for channel permission calculations.
+ * Contains overwrites, guild ID, and thread status.
+ * Used internally for resolving permission overwrites in channels and threads.
+ *
+ * @internal
+ */
 interface ChannelPermissionContext {
   overwrites: OverwriteTuple[];
   guildId: bigint;
@@ -303,6 +322,15 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     return this.higherRolePosition(guild, memberHighestRole?.id ?? 0n, compareRoleId);
   }
 
+  /**
+   * Resolves the permission context for a channel, including overwrites and thread status.
+   * Used internally for permission calculations in channels and threads.
+   *
+   * @param guild - The guild.
+   * @param channelId - The channel ID.
+   * @returns ChannelPermissionContext or undefined if channel not found.
+   * @internal
+   */
   private resolveChannelContext(
     guild: typeof this.framework.internal.cache.$inferredTypes.guild,
     channelId: bigint,
@@ -320,6 +348,17 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
     return { overwrites, guildId, isThread };
   }
 
+  /**
+   * Applies channel overwrites to a permission bitfield for a member or role.
+   * Used internally for merging permission overwrites from everyone, roles, and target.
+   *
+   * @param permissionBits - The starting permission bits.
+   * @param context - The channel permission context.
+   * @param roleIds - The role IDs to consider for overwrites.
+   * @param targetId - The target ID (member or role).
+   * @returns The updated permission bits after applying overwrites.
+   * @internal
+   */
   private applyChannelOverwrites(
     permissionBits: bigint,
     context: ChannelPermissionContext,

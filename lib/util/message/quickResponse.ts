@@ -36,6 +36,28 @@ export class QuickResponse {
     );
   }
 
+  public static EXPECTED_REJECT(reason: string): Discordeno.InteractionCallbackData {
+    const supportId = ulid();
+
+    return fastComponentV2(
+      new DiscordJSBuilders.ContainerBuilder()
+        .setAccentColor(0xD21F3C)
+        .addTextDisplayComponents((b) =>
+          b.setContent([
+            `Error: ${reason}`,
+            '',
+            'If you believe this is not expected, please try again later or report an issue if this persists.',
+          ].join('\n'))
+        )
+        .addSeparatorComponents((b) => b.setSpacing(Discordeno.SeparatorSpacingSize.Small))
+        .addTextDisplayComponents((b) =>
+          b.setContent([
+            `-# <t:${Math.floor(Date.now() / 1000)}:F> | Support ID: ${supportId}`,
+          ].join('\n'))
+        ),
+    );
+  }
+
   /**
    * Generates a Discord interaction response for failed permissions checks.
    *

@@ -1,5 +1,5 @@
-import { ulid } from '../../../deps.ts';
-import { MapWithExpiration } from '../cache/mapWithExpiration.ts';
+import { ulid } from '../../deps.ts';
+import { MapWithExpiration } from './cache/mapWithExpiration.ts';
 
 /**
  * Options for managing state entries in StateManager.

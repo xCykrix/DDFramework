@@ -4,7 +4,11 @@ import type { DDBotInternal, DDFrameworkInternal } from '../../mod.ts';
 /**
  * Base shape for any Discord application command option.
  *
+ * Used to define the structure of options for Discord slash commands.
+ *
  * @typeParam T - The Discordeno application command option type.
+ * @example
+ * const option: StringOption = { type: Discordeno.ApplicationCommandOptionTypes.String, name: 'query', ... };
  */
 export interface BaseOption<T extends Discordeno.ApplicationCommandOptionTypes> extends Omit<Discordeno.ApplicationCommandOption, 'nameLocalizations' | 'descriptionLocalizations'> {
   type: T;
@@ -12,6 +16,8 @@ export interface BaseOption<T extends Discordeno.ApplicationCommandOptionTypes> 
 
 /**
  * SubCommand option type for Discord application commands.
+ *
+ * Represents a single subcommand, which may have its own options.
  */
 export interface SubCommandOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.SubCommand> {
   options?: Option[];
@@ -19,6 +25,8 @@ export interface SubCommandOption extends BaseOption<Discordeno.ApplicationComma
 
 /**
  * SubCommand group option type for Discord application commands.
+ *
+ * Represents a group of subcommands, each with their own options.
  */
 export interface SubCommandGroupOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.SubCommandGroup> {
   options: SubCommandOption[];
@@ -26,39 +34,57 @@ export interface SubCommandGroupOption extends BaseOption<Discordeno.Application
 
 /**
  * String option type for Discord application commands.
+ *
+ * Used for text input fields in slash commands.
  */
 export interface StringOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.String> {}
 /**
  * Integer option type for Discord application command.
+ *
+ * Used for numeric input fields in slash commands.
  */
 export interface IntegerOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Integer> {}
 /**
  * Number option type for Discord application command.
+ *
+ * Used for floating-point numeric input fields in slash commands.
  */
 export interface NumberOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Number> {}
 /**
  * Boolean option type for Discord application command.
+ *
+ * Used for true/false input fields in slash commands.
  */
 export interface BooleanOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Boolean> {}
 /**
  * User option type for Discord application command.
+ *
+ * Used for selecting a Discord user in slash commands.
  */
 export interface UserOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.User> {}
 /**
  * Channel option type for Discord application command.
+ *
+ * Used for selecting a Discord channel in slash commands.
  */
 export interface ChannelOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Channel> {}
 /**
  * Role option type for Discord application command.
+ *
+ * Used for selecting a Discord role in slash commands.
  */
 export interface RoleOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Role> {}
 /**
  * Mentionable option type for Discord application command.
+ *
+ * Used for selecting a user or role in slash commands.
  */
 export interface MentionableOption extends BaseOption<Discordeno.ApplicationCommandOptionTypes.Mentionable> {}
 
 /**
  * Union type of every possible Discord application command option.
+ *
+ * Used for typing arrays of options in command schemas.
  */
 export type Option =
   | SubCommandGroupOption
@@ -74,6 +100,8 @@ export type Option =
 
 /**
  * Maps Discord option types to TypeScript primitives or framework types.
+ *
+ * Used for inferring argument types from command options.
  */
 export type LeafTypeMap = {
   [Discordeno.ApplicationCommandOptionTypes.String]: string;
@@ -88,6 +116,8 @@ export type LeafTypeMap = {
 
 /**
  * Recursively extracts `{ name: value }` from an options array for command argument typing.
+ *
+ * Used to build argument objects for handler callbacks.
  */
 export type ExtractArgsFromOptions<
   T extends readonly Option[] | undefined,
@@ -105,6 +135,10 @@ export type ExtractArgsFromOptions<
 
 /**
  * Full ChatInput command JSON shape for Discord application commands.
+ *
+ * Represents the schema for a Discord slash command.
+ * @example
+ * const schema: ChatInputCommandJSON = { type: ..., name: 'ping', description: 'Ping command', options: [...] };
  */
 export interface ChatInputCommandJSON {
   type: Discordeno.ApplicationCommandTypes.ChatInput;
@@ -115,11 +149,15 @@ export interface ChatInputCommandJSON {
 
 /**
  * Final argument type for a given command definition.
+ *
+ * Used for typing the args property in handler callbacks.
  */
 export type ChatInputArgs<C extends ChatInputCommandJSON> = ExtractArgsFromOptions<C['options']>;
 
 /**
  * Autocomplete response type for Discord application command options.
+ *
+ * Used for returning results from autocomplete handlers.
  */
 export type AutoCompleteResponse = {
   results: Discordeno.ApplicationCommandOptionChoice[];
@@ -130,7 +168,11 @@ export type AutoCompleteResponse = {
 /**
  * Dynamic handler type for processing commands, autocomplete, and components.
  *
+ * Used for registering callbacks for commands, autocomplete, and components.
+ *
  * @typeParam V - The command schema type.
+ * @example
+ * const handler: DynamicInjectedHandler<MyCommandSchema> = { callback: (ctx) => { ... } };
  */
 export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
   callback<T extends ChatInputArgs<V>>(passthrough: {
@@ -155,6 +197,8 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
 
 /**
  * Options for configuring a leaf handler (command/component/autocomplete).
+ *
+ * Used for specifying permissions, channel types, and component restrictions.
  */
 export type HandlerOptions = {
   guild?: {
@@ -177,6 +221,8 @@ export type HandlerOptions = {
 
 /**
  * Passthrough type for handler callbacks, providing context and arguments.
+ *
+ * Used for passing interaction context and parsed arguments to handlers.
  */
 export type HandlerPassthrough<Z extends ChatInputCommandJSON, T = ChatInputArgs<Z>> = {
   interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];
@@ -188,6 +234,8 @@ export type HandlerPassthrough<Z extends ChatInputCommandJSON, T = ChatInputArgs
 
 /**
  * Definition for a leaf node (command/component/autocomplete) in DDFramework.
+ *
+ * Used for registering commands/components/autocomplete handlers with the framework.
  */
 export interface LeafDefinition<T extends ChatInputCommandJSON> {
   schema: T;

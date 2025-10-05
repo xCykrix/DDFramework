@@ -1,7 +1,7 @@
 import type { DDFramework } from '../../mod.ts';
-import type { DDFrameworkDesiredProperties } from '../desired.ts';
 import type { DDFrameworkOptions } from '../../mod.types.ts';
 import type { BotWithCacheProxy } from '../client.ts';
+import type { DDFrameworkDesiredProperties } from '../desired.ts';
 
 /**
  * Extracts the parameter types of a specific event from the bot's event handlers.
@@ -18,27 +18,34 @@ export type EventParameters<
 > = NonNullable<T['events'][K]> extends (...args: infer P) => unknown ? P : never;
 
 /**
- * Event Manager for registering and managing Discord event listeners in DDFramework.
+ * Manages Discord event listeners for DDFramework.
+ *
+ * Handles registration, callback wiring, and error handling for all bot events.
  *
  * @typeParam T - The desired properties type for the bot instance.
  *
- * @remarks This class is used internally by DDFramework and is not intended for direct initialization by end-users.
+ * @remarks
+ * Used internally by DDFramework. Not intended for direct initialization by end-users.
  */
 export class EventManager<T extends DDFrameworkDesiredProperties> {
   /**
    * The DDFramework instance associated with this event manager.
+   *
+   * Used for accessing bot internals and event wiring.
    */
   private framework: DDFramework<T>;
 
   /**
    * Internal mapping of event names to sets of async event handler callbacks.
+   *
+   * Each event name maps to a set of registered async listeners.
    */
   private events: {
     [key in keyof typeof this.framework.internal.events]?: Set<(...args: unknown[]) => Promise<void>>;
   } = {};
 
   /**
-   * Create an instance of EventManager.
+   * Constructs an EventManager and wires up all event listeners.
    *
    * @param framework - The DDFramework instance to manage events for.
    * @param options - The options for the event manager.
@@ -60,7 +67,9 @@ export class EventManager<T extends DDFrameworkDesiredProperties> {
   }
 
   /**
-   * Add an event listener to the Discord Client.
+   * Adds an event listener to the Discord Client.
+   *
+   * Registers an async callback for the specified event name.
    *
    * @typeParam TZ - The event name (key of the events object).
    * @param event - The event to listen for.

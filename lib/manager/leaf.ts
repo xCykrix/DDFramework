@@ -6,29 +6,38 @@ import { mergeChatInputJSON } from '../util/object/mergeChatInputJSON.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, Option } from './leaf.types.ts';
 
 /**
- * Leaf Manager for managing command, component, and autocomplete leaf nodes in DDFramework.
+ * Manages command, component, and autocomplete leaf nodes in DDFramework.
  *
- * @remarks This class is used internally by DDFramework and is not intended for direct initialization by end-users.
+ * Handles registration, schema merging, and event wiring for all bot interaction handlers.
+ *
+ * @remarks
+ * Used internally by DDFramework. Not intended for direct initialization by end-users.
  */
 export class LeafManager {
   private framework: DDFrameworkInternal;
   private options: DDFrameworkOptions;
 
   /**
-   * Map of command names to their registered command schemas.
+   * Maps command names to their registered command schemas.
+   *
+   * Used for upserting application commands to Discord guilds.
    */
   public linkedSchemas: Map<string, ChatInputCommandJSON> = new Map();
   /**
-   * Map of command/component paths to their handler options.
+   * Maps command/component paths to their handler options.
+   *
+   * Used for permission checks and handler invocation.
    */
   public linkedOptions: Map<string, HandlerOptions> = new Map();
   /**
-   * Map of command/component paths to their dynamic handler implementations.
+   * Maps command/component paths to their dynamic handler implementations.
+   *
+   * Used for routing interactions to the correct callback.
    */
   public linkedDynamics: Map<string, DynamicInjectedHandler<ChatInputCommandJSON>> = new Map();
 
   /**
-   * Create an instance of LeafManager.
+   * Constructs a LeafManager and wires up all interaction handlers.
    *
    * @param framework - The bot instance to manage leaves for.
    * @param options - The options for the leaf manager.
@@ -59,7 +68,9 @@ export class LeafManager {
   }
 
   /**
-   * Register a leaf definition (command/component/autocomplete handler).
+   * Registers a leaf definition (command, component, or autocomplete handler).
+   *
+   * Adds all dynamic paths and component IDs to the internal handler maps, and merges schemas for upsert.
    *
    * @typeParam T - The command schema type.
    * @param definition - The leaf definition to register.
@@ -78,11 +89,13 @@ export class LeafManager {
   }
 
   /**
-   * Recursively iterate dynamic command/component paths from options.
+   * Recursively yields all dynamic command/component paths from options.
+   *
+   * Used for registering subcommands and groups for handler lookup.
    *
    * @param base - The base path to start from.
    * @param options - The options to extract paths from.
-   * @returns An array of dynamic paths.
+   * @returns Generator of dynamic path strings.
    */
   private *iterateCommandPaths(
     base: string,
@@ -106,13 +119,26 @@ export class LeafManager {
   }
 
   /**
-   * Register a dynamic path or component identifier with its handler and options.
+   * Registers a dynamic path or component identifier with its handler and options.
+   *
+   * Internal utility for linkLeaf.
+   *
+   * @param path - The command/component path or custom ID.
+   * @param definition - The leaf definition containing handler and options.
    */
   private registerLink<T extends ChatInputCommandJSON>(path: string, definition: LeafDefinition<T>): void {
     this.linkedDynamics.set(path, definition.handler as DynamicInjectedHandler<ChatInputCommandJSON>);
     this.linkedOptions.set(path, definition.options);
   }
 
+  /**
+   * Merges a command schema into the linkedSchemas map, combining with any existing schema.
+   *
+   * Ensures unique array values and combines sets/maps for Discord application command upsert.
+   *
+   * @param name - The command name.
+   * @param schema - The command schema to merge.
+   */
   private mergeSchema(name: string, schema: ChatInputCommandJSON): void {
     const existing = this.linkedSchemas.get(name);
     if (!existing) {

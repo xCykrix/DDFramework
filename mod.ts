@@ -1,10 +1,11 @@
 import { ulid } from './deps.ts';
+import { type BotWithCacheProxy, ClientGenerator } from './lib/client.ts';
 import { createDDFrameworkProperties, type DDBotDesiredMinimalProperties, type DDFrameworkDesiredProperties, type MinimalDesiredProperties } from './lib/desired.ts';
 import { EventManager } from './lib/manager/event.ts';
 import { LeafManager } from './lib/manager/leaf.ts';
-import type { DDFrameworkOptions } from './mod.types.ts';
-import { type BotWithCacheProxy, ClientGenerator } from './lib/client.ts';
 import { Permissions } from './lib/util/helpers/permission.ts';
+import { StateManager } from './lib/util/state.ts';
+import type { DDFrameworkOptions } from './mod.types.ts';
 
 /**
  * Internal DDFramework type with all desired properties.
@@ -39,6 +40,10 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = DDBotDesiredMi
    */
   private _internal_client: BotWithCacheProxy<T>;
 
+  /**
+   * State Manager for controlling temporary stateful in a standard form.
+   */
+  public state: StateManager;
   /**
    * Event Manager for registering listeners and handling Discord events.
    */
@@ -103,6 +108,7 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = DDBotDesiredMi
     }
 
     this._internal_client = new ClientGenerator<T>().create(options.token, desiredProperties);
+    this.state = new StateManager();
     this.events = new EventManager<T>(this, options);
     this._internal_events = this.events as unknown as EventManager<DDFrameworkDesiredProperties>;
     this.leaf = new LeafManager(this as unknown as DDFrameworkInternal, options);

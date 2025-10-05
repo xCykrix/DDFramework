@@ -1,6 +1,9 @@
 import { deepMerge } from '../../../deps.ts';
 
-/** Represents a single chat input option. */
+/**
+ * Represents a single chat input option in a Discord command schema.
+ * Used for merging and manipulating command option arrays.
+ */
 type ChatInputOption = { name?: string; [key: string]: unknown };
 
 /**
@@ -10,9 +13,14 @@ type ChatInputOption = { name?: string; [key: string]: unknown };
  * - Recursively merges nested options.
  * - Combines unique options and preserves unnamed options.
  *
+ * Used for deep merging command schemas when registering/updating commands.
+ *
  * @param a The first array of ChatInputCommandJSON options.
  * @param b The second array of ChatInputCommandJSON options.
  * @returns The merged array of ChatInputCommandJSON options.
+ * @example
+ * // Merges [{name: 'foo'}, {name: 'bar'}] and [{name: 'foo', desc: 'baz'}]
+ * // Result: [{name: 'foo', desc: 'baz'}, {name: 'bar'}]
  */
 export function mergeChatInputJSON(a: ChatInputOption[], b: ChatInputOption[]): ChatInputOption[] {
   if (!Array.isArray(a) || !Array.isArray(b)) return b ?? a;

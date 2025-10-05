@@ -1,5 +1,4 @@
 import { Discordeno } from '../../../deps.ts';
-import type { DDBotInternal } from '../../../mod.ts';
 
 /**
  * Extracts the full path of a Discord application command from an interaction object.
@@ -8,8 +7,10 @@ import type { DDBotInternal } from '../../../mod.ts';
  *
  * @param interaction - The Discord interaction object.
  * @returns The full command path as a string, or null if not found.
+ * @example
+ * // For a command /foo bar baz, returns 'foo.bar.baz'
  */
-export function getFirstPathOfApplicationCommand(interaction: DDBotInternal['transformers']['$inferredTypes']['interaction']): string | null {
+export function getFirstPathOfApplicationCommand(interaction: import('../../../mod.ts').DDBotInternal['transformers']['$inferredTypes']['interaction']): string | null {
   if (!interaction?.data?.name) return null;
 
   let path = interaction.data.name;

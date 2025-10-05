@@ -1,18 +1,29 @@
-import { Discordeno } from '../../../../deps.ts';
-import type { DDFramework } from '../../../../mod.ts';
-import type { DDFrameworkDesiredProperties } from '../../../desired.ts';
-import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions } from '../../../manager/leaf.types.ts';
-import type { DDFrameworkOptions } from '../../../../mod.types.ts';
-import { QuickResponse } from '../../message/quickResponse.ts';
-import { getFirstPathOfApplicationCommand } from '../../object/getFirstPathOfApplicationCommand.ts';
+import { Discordeno } from '../../deps.ts';
+import type { DDFramework } from '../../mod.ts';
+import type { DDFrameworkOptions } from '../../mod.types.ts';
+import type { DDFrameworkDesiredProperties } from '../desired.ts';
+import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions } from '../manager/leaf.types.ts';
+import { QuickResponse } from '../util/message/quickResponse.ts';
+import { getFirstPathOfApplicationCommand } from '../util/object/getFirstPathOfApplicationCommand.ts';
 
+/**
+ * Internal structure for a linked command/component definition.
+ * Used for routing and permission checks.
+ */
 type LinkedDefinition = {
   options: HandlerOptions;
   handler: DynamicInjectedHandler<ChatInputCommandJSON>;
 };
 
+/**
+ * Type alias for cache-inferred types used in handler context.
+ */
 type CacheTypes = DDFramework<DDFrameworkDesiredProperties>['internal']['cache']['$inferredTypes'];
 
+/**
+ * Context object for guild-related handler execution.
+ * Includes resolved guild, member, channel, and bot member.
+ */
 type GuildContext = {
   guild: CacheTypes['guild'];
   member: CacheTypes['member'];
@@ -51,19 +62,29 @@ export function injectChatInputHandler(framework: DDFramework<DDFrameworkDesired
 
     // Enforce Guild Requirement
     if (requireGuild && interaction.guildId === undefined) {
-      await interaction.respond(QuickResponse.INTERNAL_REJECT(
-        fwoptions,
-        'This action is restricted to use in guild context. Please do not issue this via DMs.',
-      ));
+      await interaction.respond(
+        QuickResponse.INTERNAL_REJECT(
+          fwoptions,
+          'This action is restricted to use in guild context. Please do not issue this via DMs.',
+        ),
+        {
+          isPrivate: true,
+        },
+      );
       return;
     }
 
     // Enforce Developer Requirement
     if (options.developerRequired && !fwoptions.developers.includes(`${interaction.user.id}`)) {
-      await interaction.respond(QuickResponse.INTERNAL_REJECT(
-        fwoptions,
-        'This is a restricted action. You do not have permission to issue this request.',
-      ));
+      await interaction.respond(
+        QuickResponse.INTERNAL_REJECT(
+          fwoptions,
+          'This is a restricted action. You do not have permission to issue this request.',
+        ),
+        {
+          isPrivate: true,
+        },
+      );
       return;
     }
 
@@ -87,6 +108,9 @@ export function injectChatInputHandler(framework: DDFramework<DDFrameworkDesired
             'User',
             guildOptions.userRequiredGuildPermissions,
           ),
+          {
+            isPrivate: true,
+          },
         );
         return;
       }
@@ -101,6 +125,9 @@ export function injectChatInputHandler(framework: DDFramework<DDFrameworkDesired
             'User',
             guildOptions.userRequiredChannelPermissions,
           ),
+          {
+            isPrivate: true,
+          },
         );
         return;
       }
@@ -115,6 +142,9 @@ export function injectChatInputHandler(framework: DDFramework<DDFrameworkDesired
             'Bot',
             guildOptions.botRequiredGuildPermissions,
           ),
+          {
+            isPrivate: true,
+          },
         );
         return;
       }
@@ -129,6 +159,9 @@ export function injectChatInputHandler(framework: DDFramework<DDFrameworkDesired
             'Bot',
             guildOptions.botRequiredChannelPermissions,
           ),
+          {
+            isPrivate: true,
+          },
         );
         return;
       }
@@ -146,6 +179,16 @@ export function injectChatInputHandler(framework: DDFramework<DDFrameworkDesired
   });
 }
 
+/**
+ * Resolves the linked handler and options for a given command/component path.
+ * Used for routing interactions to the correct handler.
+ *
+ * @param framework - The DDFramework instance.
+ * @param options - Framework options.
+ * @param interaction - The Discord interaction.
+ * @param path - The command/component path.
+ * @returns LinkedDefinition or undefined if not found.
+ */
 async function resolveLinkedDefinition(
   framework: DDFramework<DDFrameworkDesiredProperties>,
   options: DDFrameworkOptions,
@@ -157,10 +200,15 @@ async function resolveLinkedDefinition(
     options.errorHandler(
       new Deno.errors.InvalidData(`[DDFramework:InternalError] No linked options found for path: ${path}`),
     );
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      options,
-      'This action is not correctly configured. Please report this issue to the bot developer. (LINKED_OPTIONS_MISSING)',
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        options,
+        'This action is not correctly configured. Please report this issue to the bot developer. (LINKED_OPTIONS_MISSING)',
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return undefined;
   }
 
@@ -169,16 +217,30 @@ async function resolveLinkedDefinition(
     options.errorHandler(
       new Deno.errors.InvalidData(`[DDFramework:InternalError] No linked handler found for path: ${path}`),
     );
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      options,
-      'This action is not correctly configured. Please report this issue to the bot developer. (LINKED_HANDLER_MISSING)',
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        options,
+        'This action is not correctly configured. Please report this issue to the bot developer. (LINKED_HANDLER_MISSING)',
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return undefined;
   }
 
   return { options: linkedOptions, handler };
 }
 
+/**
+ * Validates that the interaction's channel type matches the required types for the handler.
+ * Used for enforcing channel restrictions on commands/components.
+ *
+ * @param interaction - The Discord interaction.
+ * @param options - Handler options.
+ * @param fwoptions - Framework options.
+ * @returns True if channel type is valid, false otherwise.
+ */
 async function validateChannelRequirements(
   interaction: DDFramework<DDFrameworkDesiredProperties>['internal']['transformers']['$inferredTypes']['interaction'],
   options: HandlerOptions,
@@ -186,26 +248,45 @@ async function validateChannelRequirements(
 ): Promise<boolean> {
   const requiredTypes = options.channelTypesRequired;
   if (requiredTypes.length === 0) {
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      fwoptions,
-      'This action is not correctly configured to access channel types. Please report this issue to the bot developer.',
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        fwoptions,
+        'This action is not correctly configured to access channel types. Please report this issue to the bot developer.',
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return false;
   }
 
   const channelType = interaction.channel?.type;
   if (channelType === undefined || !(requiredTypes as Discordeno.ChannelTypes[]).includes(channelType)) {
     const channelName = Object.entries(Discordeno.ChannelTypes).find(([, value]) => value === channelType)?.[0] ?? 'Unknown';
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      fwoptions,
-      `This action is not configured to access '${channelName}' types. Please report this issue to the bot developer if you believe this is an error.`,
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        fwoptions,
+        `This action is not configured to access '${channelName}' types. Please report this issue to the bot developer if you believe this is an error.`,
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return false;
   }
 
   return true;
 }
 
+/**
+ * Resolves the guild, member, channel, and bot member context for a given interaction.
+ * Used for permission checks and handler execution in guild context.
+ *
+ * @param framework - The DDFramework instance.
+ * @param interaction - The Discord interaction.
+ * @param fwoptions - Framework options.
+ * @returns GuildContext or undefined if required data is missing.
+ */
 async function resolveGuildContext(
   framework: DDFramework<DDFrameworkDesiredProperties>,
   interaction: DDFramework<DDFrameworkDesiredProperties>['internal']['transformers']['$inferredTypes']['interaction'],
@@ -215,10 +296,15 @@ async function resolveGuildContext(
   const channelId = interaction.channelId;
 
   if (!guildId || !channelId) {
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      fwoptions,
-      'This action was not able to access the required guild data. Please report this issue to the bot developer if this issue persists. (GUILD_DATA_MISSING/MULTI_CACHE_MISS)',
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        fwoptions,
+        'This action was not able to access the required guild data. Please report this issue to the bot developer if this issue persists. (GUILD_DATA_MISSING/MULTI_CACHE_MISS)',
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return undefined;
   }
 
@@ -232,10 +318,15 @@ async function resolveGuildContext(
     fwoptions.errorHandler(
       new Deno.errors.InvalidData(`[DDFramework:InternalError] Cache data for interaction '${interaction.id}' was missing. GID:${guildId}/CA${guild?.id}, UID:${interaction.user.id}/CA${member?.id}, CID:${channelId}/CA${channel?.id}`),
     );
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      fwoptions,
-      'This action was not able to access the required guild data. Please report this issue to the bot developer if this issue persists. (GUILD_DATA_MISSING/MULTI_CACHE_MISS)',
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        fwoptions,
+        'This action was not able to access the required guild data. Please report this issue to the bot developer if this issue persists. (GUILD_DATA_MISSING/MULTI_CACHE_MISS)',
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return undefined;
   }
 
@@ -249,10 +340,15 @@ async function resolveGuildContext(
     fwoptions.errorHandler(
       new Deno.errors.InvalidData(`[DDFramework:InternalError] Bot cache data for interaction '${interaction.id}' was missing. GID:${guildId}/CA${guild.id}, UID:${framework.internal.id}/CA${undefined}, CID:${channelId}/CA${channel.id}`),
     );
-    await interaction.respond(QuickResponse.INTERNAL_REJECT(
-      fwoptions,
-      'This action was not able to access the required guild data. Please report this issue to the bot developer if this issue persists. (GUILD_DATA_MISSING/BOT_MEMBER_CACHE_MISS)',
-    ));
+    await interaction.respond(
+      QuickResponse.INTERNAL_REJECT(
+        fwoptions,
+        'This action was not able to access the required guild data. Please report this issue to the bot developer if this issue persists. (GUILD_DATA_MISSING/BOT_MEMBER_CACHE_MISS)',
+      ),
+      {
+        isPrivate: true,
+      },
+    );
     return undefined;
   }
 

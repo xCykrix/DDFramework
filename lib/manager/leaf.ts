@@ -1,7 +1,8 @@
 import { deepMerge, Discordeno } from '../../deps.ts';
 import type { DDFrameworkInternal } from '../../mod.ts';
 import type { DDFrameworkOptions } from '../../mod.types.ts';
-import { injectChatInputHandler } from '../util/internal/event/chatInputHandler.ts';
+import { injectChatInputHandler } from '../event/chatInputHandler.ts';
+import { injectComponentHandler } from '../event/componentHandler.ts';
 import { mergeChatInputJSON } from '../util/object/mergeChatInputJSON.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, Option } from './leaf.types.ts';
 
@@ -50,7 +51,7 @@ export class LeafManager {
     injectChatInputHandler(this.framework, this.options);
 
     // Initialize Component Handler for Leaf Components
-    // ...
+    injectComponentHandler(this.framework, this.options);
 
     // Initialize Autocomplete Handler Leaf Autocomplete
     // ...

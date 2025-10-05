@@ -190,7 +190,12 @@ export function createDDFrameworkProperties<T extends object>(
   userProperties: OptionalDesiredProperties<T>,
 ): T & typeof desiredPropertiesMinimal {
   // Fill missing keys using desiredPropertiesMinimal as the schema so required cache fields stay enabled
-  return fillDefaults(userProperties, desiredPropertiesMinimal) as T & typeof desiredPropertiesMinimal;
+  const mergedProperties = fillDefaults(userProperties, desiredPropertiesMinimal) as T & typeof desiredPropertiesMinimal;
+
+  // Debug logging to verify the merged properties
+  console.debug('[DDFramework] Merged Desired Properties:', JSON.stringify(mergedProperties, null, 2));
+
+  return mergedProperties;
 }
 
 /**

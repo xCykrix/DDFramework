@@ -1,4 +1,4 @@
-import { ulid } from '../../deps.ts';
+import { getULID } from '../../deps.ts';
 import { MapWithExpiration } from './cache/mapWithExpiration.ts';
 
 /**
@@ -51,7 +51,7 @@ export class StateManager {
     packet: unknown,
     options?: StateOptions,
   ): string {
-    const storageId = ulid();
+    const storageId = getULID();
     this.state.set(storageId, {
       groupId,
       storageId,

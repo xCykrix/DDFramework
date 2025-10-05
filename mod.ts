@@ -1,4 +1,4 @@
-import { ulid } from './deps.ts';
+import { getULID } from './deps.ts';
 import { type BotWithCacheProxy, ClientGenerator } from './lib/client.ts';
 import { createDDFrameworkProperties, type DDBotDesiredMinimalProperties, type DDFrameworkDesiredProperties, type MinimalDesiredProperties } from './lib/desired.ts';
 import { EventManager } from './lib/manager/event.ts';
@@ -72,7 +72,7 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = DDBotDesiredMi
    * Includes unique ID generation via `ulid`.
    */
   public utils = {
-    ulid,
+    ulid: getULID,
   };
 
   /**
@@ -135,4 +135,9 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = DDBotDesiredMi
       this.options.errorHandler?.(e);
     });
   }
+}
+
+export {
+  createDDFrameworkProperties,
+  
 }

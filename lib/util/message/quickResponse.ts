@@ -1,4 +1,4 @@
-import { Discordeno, DiscordJSBuilders, ulid } from '../../../deps.ts';
+import { Discordeno, DiscordJSBuilders, getULID } from '../../../deps.ts';
 import type { DDFrameworkOptions } from '../../../mod.types.ts';
 import { fastComponentV2 } from './componentHelpers.ts';
 
@@ -14,7 +14,7 @@ export class QuickResponse {
    * @returns A Discordeno InteractionCallbackData payload for the error.
    */
   public static INTERNAL_REJECT(options: DDFrameworkOptions, reason?: string): Discordeno.InteractionCallbackData {
-    const supportId = ulid();
+    const supportId = getULID();
     options.errorHandler(new Deno.errors.PermissionDenied(`[DDFramework] Interaction Rejected: ${reason} | Support ID: ${supportId}`));
 
     return fastComponentV2(
@@ -37,7 +37,7 @@ export class QuickResponse {
   }
 
   public static EXPECTED_REJECT(reason: string): Discordeno.InteractionCallbackData {
-    const supportId = ulid();
+    const supportId = getULID();
 
     return fastComponentV2(
       new DiscordJSBuilders.ContainerBuilder()
@@ -67,7 +67,7 @@ export class QuickResponse {
    * @returns A Discordeno InteractionCallbackData payload for the permission error.
    */
   public static PERMISSIONS_CHECK_FAILED(options: DDFrameworkOptions, userType: 'User' | 'Bot', requiredPermissions: Discordeno.PermissionStrings[]): Discordeno.InteractionCallbackData {
-    const supportId = ulid();
+    const supportId = getULID();
     options.errorHandler(new Deno.errors.PermissionDenied(`[DDFramework] Permissions Check Failed: ${userType} is missing one of the required permissions. (${requiredPermissions.join(', ')}) . Support ID: ${supportId}`));
 
     return fastComponentV2(

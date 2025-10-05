@@ -10,7 +10,5 @@ export * as deepMerge from 'jsr:@cross/deepmerge@1.0.0';
 import 'jsr:@std/fs@1.0.19';
 
 export {
-  decodeTime,
-  monotonicUlid,
-  ulid
+  decodeTime, ulid as getULID, monotonicUlid
 } from 'jsr:@std/ulid@1.0.0';

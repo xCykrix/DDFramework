@@ -9,6 +9,8 @@
     "jsr:@std/ulid@1.0.0": "1.0.0",
     "npm:@discordeno/bot@22.0.1-next.4e4bc48": "22.0.1-next.4e4bc48",
     "npm:@discordjs/builders@2.0.0-dev.1759363313-f510b5ffa": "2.0.0-dev.1759363313-f510b5ffa",
+    "npm:@leeoniya/ufuzzy@*": "1.0.18",
+    "npm:@leeoniya/ufuzzy@1.0.18": "1.0.18",
     "npm:dd-cache-proxy@2.6.5": "2.6.5_@discordeno+bot@22.0.1-next.4e4bc48"
   },
   "jsr": {
@@ -83,7 +85,11 @@
       ]
     },
     "@discordjs/util@2.0.0-dev.1759363313-f510b5ffa": {
-      "integrity": "sha512-84PwcSH7ZQnsMluBr43IfoCbhPN1V18nH2FOzm6+JdUPKeh0peStaRljSwiTRRFDcdY5CufcNvde/5kksH0kJA=="
+      "integrity": "sha512-84PwcSH7ZQnsMluBr43IfoCbhPN1V18nH2FOzm6+JdUPKeh0peStaRljSwiTRRFDcdY5CufcNvde/5kksH0kJA==",
+      "deprecated": true
+    },
+    "@leeoniya/ufuzzy@1.0.18": {
+      "integrity": "sha512-5D54A86/VaPvJVf7UWJgy+UyhDtstUxq0iQd8UOZ2TG3NjV2oSoa9m4qW3VsotDD6dH2SNHDQwSPq+IAuudnag=="
     },
     "dd-cache-proxy@2.6.5_@discordeno+bot@22.0.1-next.4e4bc48": {
       "integrity": "sha512-qhY+R5r+bpIv0yOQHAJZvECmgNVojj7HAfj+Exn3k0d0qP4DzV58mNl1DJrPFPTw4cayT23FSm4OXIIAJy586g==",

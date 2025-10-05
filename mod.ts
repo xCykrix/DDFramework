@@ -1,4 +1,4 @@
-import { getULID } from './deps.ts';
+import { decodeTime, DiscordJSBuilders, getULID, monotonicUlid } from './deps.ts';
 import { type BotWithCacheProxy, ClientGenerator } from './lib/client.ts';
 import { createDDFrameworkProperties, type DDBotDesiredMinimalProperties, type DDFrameworkDesiredProperties, type MinimalDesiredProperties } from './lib/desired.ts';
 import { EventManager } from './lib/manager/event.ts';
@@ -137,7 +137,4 @@ export class DDFramework<T extends DDFrameworkDesiredProperties = DDBotDesiredMi
   }
 }
 
-export {
-  createDDFrameworkProperties,
-  
-}
+export { createDDFrameworkProperties, decodeTime, DiscordJSBuilders, getULID, monotonicUlid };

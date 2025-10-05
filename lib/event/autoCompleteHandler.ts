@@ -3,6 +3,7 @@ import type { DDFramework } from '../../mod.ts';
 import type { DDFrameworkOptions } from '../../mod.types.ts';
 import type { DDFrameworkDesiredProperties } from '../desired.ts';
 import { getFirstPathOfApplicationCommand } from '../util/object/getFirstPathOfApplicationCommand.ts';
+import { getFocusedOption } from '../util/object/getFocusedOption.ts';
 
 /**
  * Registers the DDFramework autocomplete handler and wires it into the framework event bus.
@@ -18,11 +19,9 @@ export function injectAutoCompleteHandler(
     if (interaction.type !== Discordeno.InteractionTypes.ApplicationCommandAutocomplete) return;
 
     const path = getFirstPathOfApplicationCommand(interaction);
-    console.info('p0', path);
     if (!path) return;
 
     if (interaction.data?.name !== path.split('.')[0]) return;
-    console.info('p1', interaction.data?.name, path.split('.')[0]);
 
     const linkedOptions = framework.leaf.linkedOptions.get(path);
     if (!linkedOptions) {
@@ -40,15 +39,13 @@ export function injectAutoCompleteHandler(
       return;
     }
 
-    const focusedOption = interaction.data?.options?.find((option) => option.focused) ?? null;
-    console.info('focusedOption', focusedOption);
-    if (!focusedOption) return;
+    const focused = getFocusedOption(interaction.data?.options) ?? null;
+    if (focused === null) return;
 
     const generated = await dynamicHandler.autocomplete({
       interaction,
-      focused: focusedOption,
+      focused,
     });
-    console.info('generated', generated);
     if (generated === null) return;
 
     if (generated.results.length === 0) {
@@ -67,7 +64,7 @@ export function injectAutoCompleteHandler(
     }
 
     const haystack = generated.results.map((result) => result.name);
-    const needle = `${focusedOption.value ?? ''}`;
+    const needle = `${focused.value ?? ''}`;
     const uf = new uFuzzy.default();
 
     const choices: Discordeno.ApplicationCommandOptionChoice[] = [];

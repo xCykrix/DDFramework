@@ -1,6 +1,6 @@
 import { Discordeno, DiscordJSBuilders, getULID } from '../../../deps.ts';
 import type { DDFrameworkOptions } from '../../../mod.types.ts';
-import { fastComponentV2 } from './componentHelpers.ts';
+import { coerce, fastComponentV2 } from './componentHelpers.ts';
 
 /**
  * Utility class for generating quick Discord interaction responses for errors and permission checks.
@@ -87,5 +87,15 @@ export class QuickResponse {
           ].join('\n'))
         ),
     );
+  }
+
+  /**
+   * Coerces a ContainerBuilder into MessageComponents.
+   *
+   * @param builder - The ContainerBuilder to convert.
+   * @returns The coerced MessageComponents.
+   */
+  public static coerce(builder: DiscordJSBuilders.ContainerBuilder): Discordeno.MessageComponents {
+    return coerce(builder);
   }
 }

@@ -183,11 +183,11 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
     botMember?: DDBotInternal['cache']['$inferredTypes']['member'];
     args: T;
   }): Promise<void>;
-  component?<Z>(passthrough: {
+  component?(passthrough: {
     interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];
     baseCustomId: string;
     parsedModal: Map<string, string> | null;
-    statePacket: Z | null;
+    statePacket: unknown | null;
   }): Promise<void>;
   autocomplete?<T extends Discordeno.InteractionDataOption>(passthrough: {
     interaction: DDBotInternal['transformers']['$inferredTypes']['interaction'];

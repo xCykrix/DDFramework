@@ -72,10 +72,16 @@ export class StateManager {
   public retrieve<T>(
     storageId: string,
     userId: string,
-  ): T | null {
+  ): {
+    groupId: string;
+    value: T;
+  } | null {
     const retrieval = this.state.get(storageId) as StoredGeneric<T> | undefined;
     if (retrieval === undefined || (retrieval.userId !== userId)) return null;
-    return retrieval.value;
+    return {
+      groupId: retrieval.groupId,
+      value: retrieval.value,
+    };
   }
 }
 

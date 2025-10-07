@@ -68,7 +68,7 @@ export class QuickResponse {
    */
   public static PERMISSIONS_CHECK_FAILED(options: DDFrameworkOptions, userType: 'User' | 'Bot', requiredPermissions: Discordeno.PermissionStrings[]): Discordeno.InteractionCallbackData {
     const supportId = getULID();
-    options.errorHandler(new Deno.errors.PermissionDenied(`[DDFramework] Permissions Check Failed: ${userType} is missing one of the required permissions. (${requiredPermissions.join(', ')}) . Support ID: ${supportId}`));
+    options.errorHandler(new Deno.errors.PermissionDenied(`[DDFramework] Permissions Check Failed: ${userType} is missing one of the required permissions. (${requiredPermissions.join(', ')}) | Support ID: ${supportId}`), null);
 
     return fastComponentV2(
       new DiscordJSBuilders.ContainerBuilder()

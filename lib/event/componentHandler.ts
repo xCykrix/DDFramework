@@ -28,35 +28,32 @@ export function injectComponentHandler(
     if (!customId) {
       fwoptions.errorHandler(
         new Deno.errors.InvalidData('[DDFramework:ComponentHandler] Interaction received was missing a customId.'),
+        customId,
       );
       return;
     }
+    const statePacket = customId ? framework.state.retrieve(customId, `${interaction.user.id}`) : null;
 
-    // Extract path and state packet ID from customId
-    const [path, statePacketId] = customId.split(' ');
-    if (!path) return;
-
-    const linkedOptions = framework.leaf.linkedOptions.get(path);
+    const linkedOptions = framework.leaf.linkedOptions.get(customId);
     if (!linkedOptions) {
       fwoptions.errorHandler(
-        new Deno.errors.NotFound(`[DDFramework:ComponentHandler] No linkedOptions found for path: ${path}`),
+        new Deno.errors.NotFound(`[DDFramework:ComponentHandler] No linkedOptions found for path: ${customId}`),
+        `Custom ID: ${customId}`,
       );
       return;
     }
 
-    const dynamicHandler = framework.leaf.linkedDynamics.get(path);
+    const dynamicHandler = framework.leaf.linkedDynamics.get(customId);
     if (!dynamicHandler?.component) {
       fwoptions.errorHandler(
-        new Deno.errors.NotFound(`[DDFramework:ComponentHandler] No dynamicHandler.component found for path: ${path}`),
+        new Deno.errors.NotFound(`[DDFramework:ComponentHandler] No dynamicHandler.component found for path: ${customId}`),
+        `Custom ID: ${customId}`,
       );
       return;
     }
 
     // Build passthrough data
-    const baseCustomId = customId.split('/')[0] ?? null;
-    const statePacket = statePacketId ? framework.state.retrieve(statePacketId, `${interaction.user.id}`) : null;
-
-    if (linkedOptions.components?.requireStatePacket && statePacket === null) {
+    if ((linkedOptions.components?.requireStatePacket ?? true) && statePacket === null) {
       await interaction.respond(
         QuickResponse.EXPECTED_REJECT(
           'This interaction has expired or is invalid. Please try again.',
@@ -69,8 +66,8 @@ export function injectComponentHandler(
     // Pass to handler
     await dynamicHandler.component({
       interaction,
-      baseCustomId,
-      statePacket,
+      baseCustomId: statePacket?.groupId ?? ``,
+      statePacket: statePacket?.value ?? null,
       parsedModal: interaction.type === Discordeno.InteractionTypes.ModalSubmit ? parseModal(interaction) : null,
     });
   });

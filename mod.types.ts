@@ -17,5 +17,5 @@ export type DDFrameworkOptions = {
   developers: string[];
 
   /** Error Handler */
-  errorHandler: (error: Error | string) => void;
+  errorHandler: (error: Error | string, context: unknown | Error) => void;
 };

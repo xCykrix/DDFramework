@@ -13,9 +13,9 @@ export class QuickResponse {
    * @param reason - Optional reason for rejection.
    * @returns A Discordeno InteractionCallbackData payload for the error.
    */
-  public static INTERNAL_REJECT(options: DDFrameworkOptions, reason?: string): Discordeno.InteractionCallbackData {
+  public static INTERNAL_REJECT(options: DDFrameworkOptions, reason?: string, context?: unknown | Error): Discordeno.InteractionCallbackData {
     const supportId = getULID();
-    options.errorHandler(new Deno.errors.PermissionDenied(`[DDFramework] Interaction Rejected: ${reason} | Support ID: ${supportId}`));
+    options.errorHandler(new Deno.errors.PermissionDenied(`[DDFramework] Interaction Rejected: ${reason} | Support ID: ${supportId}\n${context}`));
 
     return fastComponentV2(
       new DiscordJSBuilders.ContainerBuilder()

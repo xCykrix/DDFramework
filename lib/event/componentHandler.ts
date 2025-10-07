@@ -34,7 +34,7 @@ export function injectComponentHandler(
     }
     const statePacket = customId ? framework.state.retrieve(customId, `${interaction.user.id}`) : null;
 
-    const linkedOptions = framework.leaf.linkedOptions.get(customId);
+    const linkedOptions = framework.leaf.linkedOptions.get(statePacket?.groupId ?? '');
     if (!linkedOptions) {
       fwoptions.errorHandler(
         new Deno.errors.NotFound(`[DDFramework:ComponentHandler] No linkedOptions found for path: ${customId}`),
@@ -43,7 +43,7 @@ export function injectComponentHandler(
       return;
     }
 
-    const dynamicHandler = framework.leaf.linkedDynamics.get(customId);
+    const dynamicHandler = framework.leaf.linkedDynamics.get(statePacket?.groupId ?? '');
     if (!dynamicHandler?.component) {
       fwoptions.errorHandler(
         new Deno.errors.NotFound(`[DDFramework:ComponentHandler] No dynamicHandler.component found for path: ${customId}`),

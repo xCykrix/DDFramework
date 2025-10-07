@@ -57,7 +57,6 @@ export function fastGenericComponentV2(
     builder.addSeparatorComponents((b) => b.setSpacing(Discordeno.SeparatorSpacingSize.Small));
   }
   builder
-    .addSeparatorComponents((b) => b.setSpacing(Discordeno.SeparatorSpacingSize.Small))
     .addTextDisplayComponents((b) => b.setContent(`-# <t:${Math.floor(Date.now() / 1000)}:F>`));
 
   return fastComponentV2(

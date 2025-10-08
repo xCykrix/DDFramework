@@ -5,7 +5,7 @@ export * as DDCacheProxy from 'npm:dd-cache-proxy@2.6.5';
 
 export * as uFuzzy from 'npm:@leeoniya/ufuzzy@1.0.18';
 
-export * as DiscordJSBuilders from 'npm:@discordjs/builders@2.0.0-dev.1759363313-f510b5ffa';
+export * as DiscordJSBuilders from 'npm:@discordjs/builders@1.12.1';
 
 export * as deepMerge from 'jsr:@cross/deepmerge@1.0.0';
 

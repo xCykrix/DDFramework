@@ -3,13 +3,12 @@
   "specifiers": {
     "jsr:@cross/deepmerge@1.0.0": "1.0.0",
     "jsr:@std/fs@1.0.19": "1.0.19",
-    "jsr:@std/internal@^1.0.10": "1.0.10",
-    "jsr:@std/internal@^1.0.9": "1.0.10",
+    "jsr:@std/internal@^1.0.10": "1.0.12",
+    "jsr:@std/internal@^1.0.9": "1.0.12",
     "jsr:@std/path@^1.1.1": "1.1.2",
     "jsr:@std/ulid@1.0.0": "1.0.0",
     "npm:@discordeno/bot@22.0.1-next.4e4bc48": "22.0.1-next.4e4bc48",
-    "npm:@discordjs/builders@2.0.0-dev.1759363313-f510b5ffa": "2.0.0-dev.1759363313-f510b5ffa",
-    "npm:@leeoniya/ufuzzy@*": "1.0.18",
+    "npm:@discordjs/builders@1.12.1": "1.12.1",
     "npm:@leeoniya/ufuzzy@1.0.18": "1.0.18",
     "npm:dd-cache-proxy@2.6.5": "2.6.5_@discordeno+bot@22.0.1-next.4e4bc48"
   },
@@ -24,8 +23,8 @@
         "jsr:@std/path"
       ]
     },
-    "@std/internal@1.0.10": {
-      "integrity": "e3be62ce42cab0e177c27698e5d9800122f67b766a0bea6ca4867886cbde8cf7"
+    "@std/internal@1.0.12": {
+      "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
     },
     "@std/path@1.1.2": {
       "integrity": "c0b13b97dfe06546d5e16bf3966b1cadf92e1cc83e56ba5476ad8b498d9e3038",
@@ -74,22 +73,36 @@
         "@discordeno/types"
       ]
     },
-    "@discordjs/builders@2.0.0-dev.1759363313-f510b5ffa": {
-      "integrity": "sha512-MORqSl+/RtNHavjgRA4GqYdE4URoFL4J52vu0OCV3UNhQmCj/WQTL/FQHxeGSaPfkDdYNOmwnUn4XEA6dZhc5Q==",
+    "@discordjs/builders@1.12.1": {
+      "integrity": "sha512-C5iNx2PgNj5MTZZ3WZeybJ7N0erYVBGDQpNPHZ4rCD21n9DejLpmQDTI8nxxGm3NapS3QwYHKZtHBEVPWBhhVw==",
       "dependencies": [
+        "@discordjs/formatters",
         "@discordjs/util",
+        "@sapphire/shapeshift",
         "discord-api-types",
+        "fast-deep-equal",
         "ts-mixer",
-        "tslib",
-        "zod"
+        "tslib"
       ]
     },
-    "@discordjs/util@2.0.0-dev.1759363313-f510b5ffa": {
-      "integrity": "sha512-84PwcSH7ZQnsMluBr43IfoCbhPN1V18nH2FOzm6+JdUPKeh0peStaRljSwiTRRFDcdY5CufcNvde/5kksH0kJA==",
-      "deprecated": true
+    "@discordjs/formatters@0.6.1": {
+      "integrity": "sha512-5cnX+tASiPCqCWtFcFslxBVUaCetB0thvM/JyavhbXInP1HJIEU+Qv/zMrnuwSsX3yWH2lVXNJZeDK3EiP4HHg==",
+      "dependencies": [
+        "discord-api-types"
+      ]
+    },
+    "@discordjs/util@1.1.1": {
+      "integrity": "sha512-eddz6UnOBEB1oITPinyrB2Pttej49M9FZQY8NxgEvc3tq6ZICZ19m70RsmzRdDHk80O9NoYN/25AqJl8vPVf/g=="
     },
     "@leeoniya/ufuzzy@1.0.18": {
       "integrity": "sha512-5D54A86/VaPvJVf7UWJgy+UyhDtstUxq0iQd8UOZ2TG3NjV2oSoa9m4qW3VsotDD6dH2SNHDQwSPq+IAuudnag=="
+    },
+    "@sapphire/shapeshift@4.0.0": {
+      "integrity": "sha512-d9dUmWVA7MMiKobL3VpLF8P2aeanRTu6ypG2OIaEv/ZHH/SUQ2iHOVyi5wAPjQ+HmnMuL0whK9ez8I/raWbtIg==",
+      "dependencies": [
+        "fast-deep-equal",
+        "lodash"
+      ]
     },
     "dd-cache-proxy@2.6.5_@discordeno+bot@22.0.1-next.4e4bc48": {
       "integrity": "sha512-qhY+R5r+bpIv0yOQHAJZvECmgNVojj7HAfj+Exn3k0d0qP4DzV58mNl1DJrPFPTw4cayT23FSm4OXIIAJy586g==",
@@ -97,11 +110,17 @@
         "@discordeno/bot"
       ]
     },
-    "discord-api-types@0.38.26": {
-      "integrity": "sha512-xpmPviHjIJ6dFu1eNwNDIGQ3N6qmPUUYFVAx/YZ64h7ZgPkTcKjnciD8bZe8Vbeji7yS5uYljyciunpq0J5NSw=="
+    "discord-api-types@0.38.29": {
+      "integrity": "sha512-+5BfrjLJN1hrrcK0MxDQli6NSv5lQH7Y3/qaOfk9+k7itex8RkA/UcevVMMLe8B4IKIawr4ITBTb2fBB2vDORg=="
+    },
+    "fast-deep-equal@3.1.3": {
+      "integrity": "sha512-f3qQ9oQy9j2AhBe/H9VC91wLmKBCCU/gDOnKNAYG5hswO7BLKj09Hc5HYNz9cGI++xlpDCIgDaitVs03ATR84Q=="
     },
     "fzstd@0.1.1": {
       "integrity": "sha512-dkuVSOKKwh3eas5VkJy1AW1vFpet8TA/fGmVA5krThl8YcOVE/8ZIoEA1+U1vEn5ckxxhLirSdY837azmbaNHA=="
+    },
+    "lodash@4.17.21": {
+      "integrity": "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
     },
     "ts-mixer@6.0.4": {
       "integrity": "sha512-ufKpbmrugz5Aou4wcr5Wc1UUFWOLhq+Fm6qa6P0w0K5Qw2yhaUoiWszhCVuNQyNwrlGiscHOmqYoAox1PtvgjA=="
@@ -111,9 +130,6 @@
     },
     "ws@8.18.3": {
       "integrity": "sha512-PEIGCY5tSlUt50cqyMXfCzX+oOPqN0vuGqWzbcJ2xvnkzkq46oOpz7dQaTDBdfICb4N14+GARUDw2XV2N4tvzg=="
-    },
-    "zod@4.1.11": {
-      "integrity": "sha512-WPsqwxITS2tzx1bzhIKsEs19ABD5vmCVa4xBo2tq/SrV4RNZtfws1EnCWQXM6yh8bD08a1idvkB5MZSBiZsjwg=="
     }
   }
 }

@@ -60,7 +60,7 @@ export class EventManager<T extends DDFrameworkDesiredProperties> {
       const key = k as keyof typeof framework.internal.events;
       framework.internal.events[key] = (...args: Parameters<NonNullable<typeof framework.internal.events[typeof key]>>) => {
         for (const callback of this.events[key]!) {
-          callback(...args).catch((error) => options.errorHandler(error));
+          callback(...args).catch((error) => options.errorHandler(new Error(`[DDFramework] Unhandled Exception in Event Listener (${key})`), error));
         }
       };
     }

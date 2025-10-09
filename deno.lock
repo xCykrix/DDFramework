@@ -7,10 +7,10 @@
     "jsr:@std/internal@^1.0.9": "1.0.12",
     "jsr:@std/path@^1.1.1": "1.1.2",
     "jsr:@std/ulid@1.0.0": "1.0.0",
-    "npm:@discordeno/bot@22.0.1-next.4e4bc48": "22.0.1-next.4e4bc48",
-    "npm:@discordjs/builders@1.12.1": "1.12.1",
+    "npm:@discordeno/bot@22.0.1-next.9393168": "22.0.1-next.9393168",
+    "npm:@discordjs/builders@1.12.2": "1.12.2",
     "npm:@leeoniya/ufuzzy@1.0.18": "1.0.18",
-    "npm:dd-cache-proxy@2.6.5": "2.6.5_@discordeno+bot@22.0.1-next.4e4bc48"
+    "npm:dd-cache-proxy@2.6.5": "2.6.5_@discordeno+bot@22.0.1-next.9393168"
   },
   "jsr": {
     "@cross/deepmerge@1.0.0": {
@@ -37,8 +37,8 @@
     }
   },
   "npm": {
-    "@discordeno/bot@22.0.1-next.4e4bc48": {
-      "integrity": "sha512-R9jQG/opWX8ExPTn3tLRNn1TQpk8nN+zb41pSppADWQQY0c8XVLQmOXUNzRUdRa2ItEqb5c1zZ+kZqoZPNYxkg==",
+    "@discordeno/bot@22.0.1-next.9393168": {
+      "integrity": "sha512-XO33DpSLn4ii3J7qIGO8mE5oJchASkNKJbC40HO+U+wvfL/t/ZouU0n+0kXV749uf0SUKZq1m5PMB3s3ghHe0Q==",
       "dependencies": [
         "@discordeno/gateway",
         "@discordeno/rest",
@@ -46,8 +46,8 @@
         "@discordeno/utils"
       ]
     },
-    "@discordeno/gateway@22.0.1-next.4e4bc48": {
-      "integrity": "sha512-AfbM6mIArhIn1rIMMHtyZVr2Dcds3EvQ4oc2PoM+VyE0dDPfRz8+prke4WGpHvdiw8OTMDpQsi3wamfFn74O1w==",
+    "@discordeno/gateway@22.0.1-next.9393168": {
+      "integrity": "sha512-PCct8UR9R/C0ZTZuIEWTMfatPlkJ+clS5KhiCobqqjX2yDbv5nC2NqeWw/DwiYLW8dlLgRG//71VvKyeSXg4QQ==",
       "dependencies": [
         "@discordeno/types",
         "@discordeno/utils",
@@ -57,24 +57,24 @@
         "fzstd"
       ]
     },
-    "@discordeno/rest@22.0.1-next.4e4bc48": {
-      "integrity": "sha512-4WxmJ8HRiUE3DhX5fABgFgmzbx0zzfkC6KZPwP/4BY8EHezPrqun3Txz3cwU9cS3L0XOor90xTfr0KfnF8GHCA==",
+    "@discordeno/rest@22.0.1-next.9393168": {
+      "integrity": "sha512-loiaXTOUOEJqy5AXUuirK7KWjEgJyMF4K2T8TMeazNkg08ompcBMdVDozfT0RPYJimb1lPYj1w8L9EEoTWdQxg==",
       "dependencies": [
         "@discordeno/types",
         "@discordeno/utils"
       ]
     },
-    "@discordeno/types@22.0.1-next.4e4bc48": {
-      "integrity": "sha512-f+7tXja+EYqLj7uOj7RkInKhIJXsaJXi2ML7Hmhtd/olXCvGfKqOcUGu2reOPYsTNU0vxqfZzRZyFOrpg6I1YQ=="
+    "@discordeno/types@22.0.1-next.9393168": {
+      "integrity": "sha512-akmtclpweOGeuf6LKKG0R+92Yyas2h2x9mRW/+Hz9BQybRCyhHQr0Cv6DCtuHCtfachlxxUYrdo91ny4mdcXwA=="
     },
-    "@discordeno/utils@22.0.1-next.4e4bc48": {
-      "integrity": "sha512-H6bGIaHXxZjWK63HIXG5bs8I3p06xsGf6uZJpBSO7cTgapUqNyG7yPunjlalnlrY6brWs5hTZWKd6MeqgnEXqw==",
+    "@discordeno/utils@22.0.1-next.9393168": {
+      "integrity": "sha512-Ubmt7h0OrB8Bu0jgwYa8UQKqJ/GJKQ4Qtaw7DYZ0j4fiejQP6HcNFw5cuOHTH9CKk4YFRyFzh0luH1kOgyTftA==",
       "dependencies": [
         "@discordeno/types"
       ]
     },
-    "@discordjs/builders@1.12.1": {
-      "integrity": "sha512-C5iNx2PgNj5MTZZ3WZeybJ7N0erYVBGDQpNPHZ4rCD21n9DejLpmQDTI8nxxGm3NapS3QwYHKZtHBEVPWBhhVw==",
+    "@discordjs/builders@1.12.2": {
+      "integrity": "sha512-AugKmrgRJOHXEyMkABH/hXpAmIBKbYokCEl9VAM4Kh6FvkdobQ+Zhv7AR6K+y5hS7+VQ7gKXPYCe1JQmV07H1g==",
       "dependencies": [
         "@discordjs/formatters",
         "@discordjs/util",
@@ -104,7 +104,7 @@
         "lodash"
       ]
     },
-    "dd-cache-proxy@2.6.5_@discordeno+bot@22.0.1-next.4e4bc48": {
+    "dd-cache-proxy@2.6.5_@discordeno+bot@22.0.1-next.9393168": {
       "integrity": "sha512-qhY+R5r+bpIv0yOQHAJZvECmgNVojj7HAfj+Exn3k0d0qP4DzV58mNl1DJrPFPTw4cayT23FSm4OXIIAJy586g==",
       "dependencies": [
         "@discordeno/bot"

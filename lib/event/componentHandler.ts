@@ -33,6 +33,15 @@ export function injectComponentHandler(
       return;
     }
     const statePacket = customId ? framework.state.retrieve(customId, `${interaction.user.id}`) : null;
+    if (statePacket === null) {
+      await interaction.respond(
+        QuickResponse.EXPECTED_REJECT(
+          'This interaction has expired or is invalid. Please try again.',
+        ),
+        { isPrivate: true },
+      );
+      return;
+    }
 
     const linkedOptions = framework.leaf.linkedOptions.get(statePacket?.groupId ?? '');
     if (!linkedOptions) {

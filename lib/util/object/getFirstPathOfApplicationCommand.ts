@@ -10,7 +10,7 @@ import { Discordeno } from '../../../deps.ts';
  * @example
  * // For a command /foo bar baz, returns 'foo.bar.baz'
  */
-export function getFirstPathOfApplicationCommand(interaction: import('../../../mod.ts').DDBotInternal['transformers']['$inferredTypes']['interaction']): string | null {
+export function getFirstPathOfApplicationCommand(interaction: Partial<Discordeno.Interaction>): string | null {
   if (!interaction?.data?.name) return null;
 
   let path = interaction.data.name;

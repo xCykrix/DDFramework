@@ -1,7 +1,7 @@
 import { Discordeno } from '../../../deps.ts';
-import type { DDFramework, DDFrameworkInternal } from '../../../mod.ts';
+import type { DDFramework } from '../../../mod.ts';
 import type { BotWithCacheProxy } from '../../client.ts';
-import type { DDFrameworkDesiredProperties } from '../../desired.ts';
+import { desiredPropertiesMinimal, Overwrite } from '../../desired.ts';
 
 /**
  * Set of Discord channel types that are considered threads.
@@ -41,8 +41,8 @@ interface ChannelPermissionContext {
  *
  * @typeParam T - The desired properties type for the bot instance.
  */
-export class Permissions<T extends DDFrameworkDesiredProperties> {
-  private framework!: DDFramework<DDFrameworkDesiredProperties>;
+export class Permissions<T extends Overwrite<T, typeof desiredPropertiesMinimal>> {
+  private framework!: DDFramework<T>;
 
   /**
    * Create an instance of Permissions utility.
@@ -51,7 +51,7 @@ export class Permissions<T extends DDFrameworkDesiredProperties> {
    */
   public constructor(framework: DDFramework<T>) {
     // Cast to general DDFramework type to access internal structures
-    this.framework = framework as unknown as DDFrameworkInternal;
+    this.framework = framework;
   }
 
   /**

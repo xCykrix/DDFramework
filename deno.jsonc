@@ -4,7 +4,7 @@
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
-    "./lib": "./lib",
+    "./lib/leaf/types.ts": "./lib/leaf/types.ts",
   },
   // Imports
   "imports": {

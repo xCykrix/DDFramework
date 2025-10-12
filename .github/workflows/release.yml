@@ -2,9 +2,6 @@ name: Automatic Release
 
 on:
   push:
-    branches:
-      - main
-      - dev
     tags:
       - 'v*.*.*'
 
@@ -15,19 +12,23 @@ permissions:
   contents: write
   discussions: write
   id-token: write
-  packages: write
 
 jobs:
   candidate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
+      - uses: actions/checkout@v5
+      # Languages
+      - uses: denoland/setup-deno@v2
         with:
-          registry: ghcr.io
-          username: ${{github.actor}}
-          password: ${{secrets.GITHUB_TOKEN}}
-      - name: 'Build Image'
-        run: |
-          docker build . --tag ghcr.io/xcykrix/passive-collectibles/arc-2:${{ github.ref_name }}
-          docker push ghcr.io/xcykrix/passive-collectibles/arc-2:${{ github.ref_name}}
+          deno-version: v2.x
+      # Publish
+      - uses: softprops/action-gh-release@v2
+        with:
+          discussion_category_name: Announcements
+          generate_release_notes: true
+          files: |
+            LICENSE
+            README.md
+      - name: 'Publish Package'
+        run: deno publish

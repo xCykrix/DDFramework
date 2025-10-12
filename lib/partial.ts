@@ -1,4 +1,4 @@
-import type { DiscordJS } from '../deps.ts';
+import type { Channel, GuildMember, Message, MessageReaction, User } from 'discord.js';
 import type { DiscordFramework } from '../mod.ts';
 /**
  * Resolves Discord.js partial objects to their complete forms by fetching them if necessary.
@@ -42,7 +42,7 @@ export class Partial {
    * @returns The full User, or null if not found or fetch fails.
    * @see {@link https://discord.js.org/#/docs/main/stable/class/User}
    */
-  public async user(user: DiscordJS.User | null): Promise<DiscordJS.User | null> {
+  public async user(user: User | null): Promise<User | null> {
     if (user === null) return null;
     if (user.partial) {
       user = await user.fetch().catch((e) => {
@@ -62,7 +62,7 @@ export class Partial {
    * @returns The full GuildMember, or null if not found or fetch fails.
    * @see {@link https://discord.js.org/#/docs/main/stable/class/GuildMember}
    */
-  public async guildMember(guildMember: DiscordJS.GuildMember | null): Promise<DiscordJS.GuildMember | null> {
+  public async guildMember(guildMember: GuildMember | null): Promise<GuildMember | null> {
     if (guildMember === null) return null;
     if (guildMember.partial) {
       guildMember = await guildMember.fetch().catch((e) => {
@@ -82,7 +82,7 @@ export class Partial {
    * @returns The full Channel, or null if not found or fetch fails.
    * @see {@link https://discord.js.org/#/docs/main/stable/class/Channel}
    */
-  public async channel(channel: DiscordJS.Channel | null): Promise<DiscordJS.Channel | null> {
+  public async channel(channel: Channel | null): Promise<Channel | null> {
     if (channel === null) return null;
     if (channel.partial) {
       channel = await channel.fetch().catch((e) => {
@@ -102,7 +102,7 @@ export class Partial {
    * @returns The full Message, or null if not found or fetch fails.
    * @see {@link https://discord.js.org/#/docs/main/stable/class/Message}
    */
-  public async message(message: DiscordJS.Message | null): Promise<DiscordJS.Message | null> {
+  public async message(message: Message | null): Promise<Message | null> {
     if (message === null) return null;
     if (message.partial) {
       message = await message.fetch().catch((e) => {
@@ -122,7 +122,7 @@ export class Partial {
    * @returns The full MessageReaction, or null if not found or fetch fails.
    * @see {@link https://discord.js.org/#/docs/main/stable/class/MessageReaction}
    */
-  public async reaction(reaction: DiscordJS.MessageReaction | null): Promise<DiscordJS.MessageReaction | null> {
+  public async reaction(reaction: MessageReaction | null): Promise<MessageReaction | null> {
     if (reaction === null) return null;
     if (reaction.partial) {
       reaction = await reaction.fetch().catch((e) => {

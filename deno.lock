@@ -365,5 +365,12 @@
     "zod@4.1.12": {
       "integrity": "sha512-JInaHOamG8pt5+Ey8kGmdcAcg3OL9reK8ltczgHTAwNhMys/6ThXHityHxVV2p3fkw/c+MAvBHFVYHFZDmjMCQ=="
     }
+  },
+  "workspace": {
+    "dependencies": [
+      "jsr:@ledger/ledger@0.1.9",
+      "npm:discord.js@15.0.0-dev.1760227315-180dd60c6",
+      "npm:discordjs-typed-commands@0.2.1"
+    ]
   }
 }

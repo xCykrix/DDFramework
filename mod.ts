@@ -1,5 +1,7 @@
-import { DiscordJS, Ledger } from './deps.ts';
+import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
+import { Ledger } from 'ledger';
 import { Partial } from './lib/partial.ts';
+
 /**
  * Main entry point for the DiscordFramework, providing configuration, logging, and Discord.js client integration.
  *
@@ -31,7 +33,7 @@ export class DiscordFramework {
   /**
    * The Discord.js client instance managed by the framework.
    */
-  public djs: DiscordJS.Client;
+  public djs: Client;
 
   /**
    * Helper for resolving Discord.js partial structures.
@@ -53,25 +55,25 @@ export class DiscordFramework {
     this.ledger.register({
       definition: 'jsr:@ledger/console-handler@0.0.4',
     });
-    this.djs = new DiscordJS.Client({
+    this.djs = new Client({
       intents: [
-        DiscordJS.GatewayIntentBits.Guilds |
-        DiscordJS.GatewayIntentBits.GuildModeration |
-        DiscordJS.GatewayIntentBits.AutoModerationExecution |
-        DiscordJS.GatewayIntentBits.GuildMembers |
-        DiscordJS.GatewayIntentBits.GuildIntegrations |
-        DiscordJS.GatewayIntentBits.GuildWebhooks |
-        DiscordJS.GatewayIntentBits.GuildMessages |
-        DiscordJS.GatewayIntentBits.DirectMessages |
-        DiscordJS.GatewayIntentBits.GuildMessageReactions |
-        DiscordJS.GatewayIntentBits.DirectMessageReactions,
+        GatewayIntentBits.Guilds |
+        GatewayIntentBits.GuildModeration |
+        GatewayIntentBits.AutoModerationExecution |
+        GatewayIntentBits.GuildMembers |
+        GatewayIntentBits.GuildIntegrations |
+        GatewayIntentBits.GuildWebhooks |
+        GatewayIntentBits.GuildMessages |
+        GatewayIntentBits.DirectMessages |
+        GatewayIntentBits.GuildMessageReactions |
+        GatewayIntentBits.DirectMessageReactions,
       ],
       partials: [
-        DiscordJS.Partials.User,
-        DiscordJS.Partials.GuildMember,
-        DiscordJS.Partials.Channel,
-        DiscordJS.Partials.Message,
-        DiscordJS.Partials.Reaction,
+        Partials.User,
+        Partials.GuildMember,
+        Partials.Channel,
+        Partials.Message,
+        Partials.Reaction,
       ],
     });
   }
@@ -86,7 +88,7 @@ export class DiscordFramework {
     await this.ledger.alive();
 
     // Print Client Connection
-    this.djs.once(DiscordJS.Events.ClientReady, (client) => {
+    this.djs.once(Events.ClientReady, (client) => {
       this.ledger.information(`[${client.user.id}] '${client.user.tag}' is connected to Discord.`);
     });
 

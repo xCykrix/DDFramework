@@ -36,7 +36,10 @@ export class DiscordFramework {
    */
   public djs: Client;
 
-  public leaf: LeafManager;
+  /**
+   * The LeafManager instance for managing command leaves.
+   */
+  public leaf: LeafManager = new LeafManager(this);
 
   /**
    * Helper for resolving Discord.js partial structures.
@@ -80,7 +83,6 @@ export class DiscordFramework {
         Partials.Reaction,
       ],
     });
-    this.leaf = new LeafManager(this);
   }
 
   /**
@@ -109,8 +111,3 @@ export interface FrameworkOptions {
   tenantId: string;
   token: string;
 }
-
-export const test = new DiscordFramework({
-  'tenantId': 'test',
-  'token': 'your-token-here',
-});

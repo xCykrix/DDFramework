@@ -1,4 +1,4 @@
-import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChannelType, ChatInputCommandInteraction, Guild, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
+import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
 
 export type LeafPrimitiveOption =
   | APIApplicationCommandStringOption
@@ -74,9 +74,10 @@ export type AutoCompleteResponse = {
 
 export type LeafHandlerContext<T extends ChatInputCommandJSON> = {
   interaction: ChatInputCommandInteraction;
-  guild?: Guild;
-  member?: GuildMember;
-  botMember?: GuildMember;
+  guild: Guild;
+  channel: GuildBasedChannel;
+  invoker: GuildMember;
+  bot: GuildMember;
   args: ChatInputArgs<T>;
 };
 
@@ -84,9 +85,9 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
   callback(passthrough: LeafHandlerContext<V>): Promise<void>;
   component?(passthrough: {
     interaction: MessageComponentInteraction | ModalSubmitInteraction;
-    baseCustomId: string;
-    parsedModal: Map<string, string> | null;
-    statePacket: unknown | null;
+    customId: string;
+    modal: Map<string, string> | null;
+    state: unknown | null;
   }): Promise<void>;
   autocomplete?(passthrough: {
     interaction: AutocompleteInteraction;
@@ -96,24 +97,18 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
 
 export type HandlerOptions = {
   guild: {
-    required: boolean;
     botRequiredGuildPermissions: bigint;
     botRequiredChannelPermissions: bigint;
     userRequiredGuildPermissions: bigint;
     userRequiredChannelPermissions: bigint;
   };
   developerRequired: boolean;
-  channelTypesRequired: ChannelType[];
-  components: {
+  channelTypesRequired: GuildChannelType[];
+  components?: {
     acceptedBaseCustomIds: string[];
     requireStatePacket: true;
     restrictToAuthor: true;
   };
-};
-
-export type HandlerPassthrough<Z extends ChatInputCommandJSON> = LeafHandlerContext<Z> & {
-  invoker?: GuildMember;
-  bot?: GuildMember;
 };
 
 export interface LeafDefinition<T extends ChatInputCommandJSON> {

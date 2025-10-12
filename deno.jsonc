@@ -7,7 +7,6 @@
   "imports": {
     "ledger": "jsr:@ledger/ledger@0.1.9",
     "discord.js": "npm:discord.js@15.0.0-dev.1760227315-180dd60c6",
-    "discordjs-typed-commands": "npm:discordjs-typed-commands@0.2.1",
   },
   "nodeModulesDir": "none",
   // Compiler Options

@@ -1,5 +1,6 @@
 import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
 import { Ledger } from 'ledger';
+import { LeafManager } from './lib/leaf/leaf.ts';
 import { Partial } from './lib/partial.ts';
 
 /**
@@ -35,6 +36,8 @@ export class DiscordFramework {
    */
   public djs: Client;
 
+  public leaf: LeafManager;
+
   /**
    * Helper for resolving Discord.js partial structures.
    * @see {@link Partial}
@@ -64,6 +67,7 @@ export class DiscordFramework {
         GatewayIntentBits.GuildIntegrations |
         GatewayIntentBits.GuildWebhooks |
         GatewayIntentBits.GuildMessages |
+        GatewayIntentBits.MessageContent |
         GatewayIntentBits.DirectMessages |
         GatewayIntentBits.GuildMessageReactions |
         GatewayIntentBits.DirectMessageReactions,
@@ -76,6 +80,7 @@ export class DiscordFramework {
         Partials.Reaction,
       ],
     });
+    this.leaf = new LeafManager(this);
   }
 
   /**
@@ -104,3 +109,8 @@ export interface FrameworkOptions {
   tenantId: string;
   token: string;
 }
+
+export const test = new DiscordFramework({
+  'tenantId': 'test',
+  'token': 'your-token-here',
+});

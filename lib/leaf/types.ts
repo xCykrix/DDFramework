@@ -1,0 +1,123 @@
+import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChannelType, ChatInputCommandInteraction, Guild, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
+
+export type LeafPrimitiveOption =
+  | APIApplicationCommandStringOption
+  | APIApplicationCommandIntegerOption
+  | APIApplicationCommandNumberOption
+  | APIApplicationCommandBooleanOption
+  | APIApplicationCommandUserOption
+  | APIApplicationCommandChannelOption
+  | APIApplicationCommandRoleOption
+  | APIApplicationCommandMentionableOption
+  | APIApplicationCommandAttachmentOption;
+
+export type LeafSubcommandOption = Omit<APIApplicationCommandSubcommandOption, 'options'> & {
+  options?: readonly LeafPrimitiveOption[];
+};
+
+export type LeafSubcommandGroupOption = Omit<APIApplicationCommandSubcommandGroupOption, 'options'> & {
+  options: readonly LeafSubcommandOption[];
+};
+
+export type LeafOption = LeafPrimitiveOption | LeafSubcommandOption | LeafSubcommandGroupOption;
+
+export type ChatInputCommandJSON = Omit<RESTPostAPIChatInputApplicationCommandsJSONBody, 'type' | 'options'> & {
+  type?: ApplicationCommandType.ChatInput;
+  options?: readonly LeafOption[];
+};
+
+export type LeafTypeMap = {
+  [ApplicationCommandOptionType.String]: string;
+  [ApplicationCommandOptionType.Integer]: number;
+  [ApplicationCommandOptionType.Number]: number;
+  [ApplicationCommandOptionType.Boolean]: boolean;
+  [ApplicationCommandOptionType.User]: User;
+  [ApplicationCommandOptionType.Channel]: Channel;
+  [ApplicationCommandOptionType.Role]: Role;
+  [ApplicationCommandOptionType.Mentionable]: GuildMember | Role | User;
+  [ApplicationCommandOptionType.Attachment]: Attachment;
+};
+
+export type ExtractArgsFromOptions<T extends readonly LeafOption[] | undefined> = T extends readonly LeafOption[] ? RequiredOptionRecord<T[number]> & OptionalOptionRecord<T[number]>
+  : Record<PropertyKey, never>;
+
+type RequiredOptionRecord<O> = {
+  [Name in ExtractRequiredOptionName<O>]-?: InferOptionArg<OptionByName<O, Name>>;
+};
+
+type OptionalOptionRecord<O> = {
+  [Name in ExtractOptionalOptionName<O>]?: InferOptionArg<OptionByName<O, Name>>;
+};
+
+type ExtractRequiredOptionName<O> = O extends { required: true; name: infer N extends string } ? N : never;
+type ExtractOptionalOptionName<O> = O extends { name: infer N extends string } ? (O extends { required: true } ? never : N) : never;
+type OptionByName<O, Name extends string> = Extract<O, { name: Name }>;
+type ExtractOptionName<O> = O extends { name: infer N extends string } ? N : never;
+
+type InferOptionArg<O> = O extends LeafSubcommandGroupOption ? SubcommandGroupArgs<O>
+  : O extends LeafSubcommandOption ? ExtractArgsFromOptions<O['options']>
+  : O extends { type: infer Type } ? Type extends keyof LeafTypeMap ? LeafTypeMap[Type]
+    : never
+  : never;
+
+type SubcommandGroupArgs<G extends LeafSubcommandGroupOption> = {
+  [Sub in G['options'][number] as ExtractOptionName<Sub>]: ExtractArgsFromOptions<Sub['options']>;
+};
+
+export type ChatInputArgs<C extends ChatInputCommandJSON> = ExtractArgsFromOptions<C['options']>;
+
+export type AutoCompleteResponse = {
+  results: APIApplicationCommandOptionChoice[];
+  perPage?: number;
+  allowEmptySearch?: boolean;
+};
+
+export type LeafHandlerContext<T extends ChatInputCommandJSON> = {
+  interaction: ChatInputCommandInteraction;
+  guild?: Guild;
+  member?: GuildMember;
+  botMember?: GuildMember;
+  args: ChatInputArgs<T>;
+};
+
+export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
+  callback(passthrough: LeafHandlerContext<V>): Promise<void>;
+  component?(passthrough: {
+    interaction: MessageComponentInteraction | ModalSubmitInteraction;
+    baseCustomId: string;
+    parsedModal: Map<string, string> | null;
+    statePacket: unknown | null;
+  }): Promise<void>;
+  autocomplete?(passthrough: {
+    interaction: AutocompleteInteraction;
+    focused: unknown;
+  }): Promise<AutoCompleteResponse | null>;
+};
+
+export type HandlerOptions = {
+  guild: {
+    required: boolean;
+    botRequiredGuildPermissions: bigint;
+    botRequiredChannelPermissions: bigint;
+    userRequiredGuildPermissions: bigint;
+    userRequiredChannelPermissions: bigint;
+  };
+  developerRequired: boolean;
+  channelTypesRequired: ChannelType[];
+  components: {
+    acceptedBaseCustomIds: string[];
+    requireStatePacket: true;
+    restrictToAuthor: true;
+  };
+};
+
+export type HandlerPassthrough<Z extends ChatInputCommandJSON> = LeafHandlerContext<Z> & {
+  invoker?: GuildMember;
+  bot?: GuildMember;
+};
+
+export interface LeafDefinition<T extends ChatInputCommandJSON> {
+  schema: T;
+  options: HandlerOptions;
+  handler: DynamicInjectedHandler<T>;
+}

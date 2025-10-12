@@ -1,8 +1,11 @@
 {
   "name": "@amethyst/ddframework",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
-  "exports": "./mod.ts",
+  "exports": {
+    ".": "./mod.ts",
+    "./*": "./*",
+  },
   // Imports
   "imports": {
     "ledger": "jsr:@ledger/ledger@0.1.9",

@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, Events, type Guild } from 'discord.js';
 import type { DiscordFramework } from '../../mod.ts';
+import { injectCommandHandler } from './event/commandHandler.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, LeafOption } from './types.ts';
 
 /**
@@ -40,6 +41,8 @@ export class LeafManager {
    */
   public constructor(framework: DiscordFramework) {
     this.framework = framework;
+
+    injectCommandHandler(this.framework);
 
     // On ready, register commands per guild using Discord.js
     this.framework.djs.once(Events.ClientReady, async () => {

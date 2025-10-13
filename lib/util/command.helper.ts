@@ -1,4 +1,4 @@
-import { ApplicationCommandOptionType, type ChatInputCommandInteraction } from 'discord.js';
+import { type ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * Extracts the full path of a Discord application command from an interaction object.
@@ -11,21 +11,17 @@ import { ApplicationCommandOptionType, type ChatInputCommandInteraction } from '
  * // For a command /foo bar baz, returns 'foo.bar.baz'
  */
 export function getFirstPathOfApplicationCommand(interaction: ChatInputCommandInteraction): string | null {
-  let path = interaction.commandName;
-  let options = interaction.options;
+  let path = '';
 
-  while (Array.isArray(options) && options.length > 0) {
-    const option = options[0];
-    if (
-      option.type === ApplicationCommandOptionType.Subcommand ||
-      option.type === ApplicationCommandOptionType.SubcommandGroup
-    ) {
-      path += `.${option.name}`;
-      options = option.options;
-    } else {
-      break;
-    }
-  }
+  const parts = {
+    base: interaction.commandName,
+    subCommandGroup: interaction.options.getSubcommandGroup(false),
+    subCommand: interaction.options.getSubcommand(false),
+  };
 
-  return path;
+  path += parts.base;
+  if (parts.subCommandGroup !== null) path += `.${parts.subCommandGroup}`;
+  if (parts.subCommand !== null) path += `.${parts.subCommand}`;
+
+  return (path.trim().length !== 0) ? path : null;
 }

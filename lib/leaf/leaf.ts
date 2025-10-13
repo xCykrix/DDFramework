@@ -42,7 +42,7 @@ export class LeafManager {
     this.framework = framework;
 
     // On ready, register commands per guild using Discord.js
-    this.framework.djs.on(Events.ClientReady, async () => {
+    this.framework.djs.once(Events.ClientReady, async () => {
       try {
         const schemas = Array.from(this.linkedSchemas.values());
         for (const guild of this.framework.djs.guilds.cache.values()) {

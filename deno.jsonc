@@ -1,6 +1,6 @@
 {
   "name": "@amethyst/ddframework",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
@@ -9,7 +9,7 @@
   // Imports
   "imports": {
     "ledger": "jsr:@ledger/ledger@0.1.9",
-    "discord.js": "npm:discord.js@15.0.0-dev.1760227315-180dd60c6",
+    "discord.js": "npm:discord.js@15.0.0-dev.1760227315-180dd60c6"
   },
   "nodeModulesDir": "none",
   // Compiler Options

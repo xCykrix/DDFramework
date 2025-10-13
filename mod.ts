@@ -39,13 +39,13 @@ export class DiscordFramework {
   /**
    * The LeafManager instance for managing command leaves.
    */
-  public leaf: LeafManager = new LeafManager(this);
+  public leaf: LeafManager;
 
   /**
    * Helper for resolving Discord.js partial structures.
    * @see {@link Partial}
    */
-  public partial: Partial = new Partial(this);
+  public partial: Partial;
 
   /**
    * Creates a new DiscordFramework instance.
@@ -83,6 +83,8 @@ export class DiscordFramework {
         Partials.Reaction,
       ],
     });
+    this.leaf = new LeafManager(this);
+    this.partial = new Partial(this);
   }
 
   /**

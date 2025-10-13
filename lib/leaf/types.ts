@@ -1,4 +1,5 @@
-import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
+import { DiscordFramework } from '@amethyst/ddframework';
+import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, PermissionResolvable, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
 
 export type LeafPrimitiveOption =
   | APIApplicationCommandStringOption
@@ -73,6 +74,7 @@ export type AutoCompleteResponse = {
 };
 
 export type LeafHandlerContext<T extends ChatInputCommandJSON> = {
+  framework: DiscordFramework;
   interaction: ChatInputCommandInteraction;
   guild: Guild;
   channel: GuildBasedChannel;
@@ -84,6 +86,7 @@ export type LeafHandlerContext<T extends ChatInputCommandJSON> = {
 export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
   callback(passthrough: LeafHandlerContext<V>): Promise<void>;
   component?(passthrough: {
+    framework: DiscordFramework;
     interaction: MessageComponentInteraction | ModalSubmitInteraction;
     customId: string;
     modal: Map<string, string> | null;
@@ -97,10 +100,10 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
 
 export type HandlerOptions = {
   guild: {
-    botRequiredGuildPermissions: bigint;
-    botRequiredChannelPermissions: bigint;
-    userRequiredGuildPermissions: bigint;
-    userRequiredChannelPermissions: bigint;
+    botRequiredGuildPermissions: PermissionResolvable;
+    botRequiredChannelPermissions: PermissionResolvable;
+    userRequiredGuildPermissions: PermissionResolvable;
+    userRequiredChannelPermissions: PermissionResolvable;
   };
   developerRequired: boolean;
   channelTypesRequired: GuildChannelType[];

@@ -1,0 +1,56 @@
+import { DiscordFramework } from '@amethyst/ddframework';
+import { ContainerBuilder, PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+
+export class ResponseBuilder {
+  public static full(callback: (builder: ContainerBuilder) => void): ContainerBuilder {
+    const builder = new ContainerBuilder();
+    callback(builder);
+    return builder
+      .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
+      .addTextDisplayComponents((b) =>
+        b.setContent(
+          `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
+        )
+      );
+  }
+
+  public static fixed(content: string[]): ContainerBuilder {
+    return this.full(
+      (builder) =>
+        builder.addTextDisplayComponents(
+          (b) => b.setContent(content.join('\n')),
+        ),
+    );
+  }
+
+  public static internal(framework: DiscordFramework, message: string, context: Error): ContainerBuilder {
+    const id = crypto.randomUUID();
+    framework.ledger.severe(`[${id}] Internal Error Response - ${message}`, {
+      err: context,
+    });
+    return this.full(
+      (builder) =>
+        builder
+          .addTextDisplayComponents((b) =>
+            b.setContent([
+              'This request was acknowledged but not processed due to one or more internal exceptions or security violations. Please try again later or report this as an issue.',
+              '',
+              `**Technical Details**: ${message}`,
+              `**Support ID**: ${id}`,
+            ].join('\n'))
+          ),
+    );
+  }
+
+  public static permission(permissions: PermissionResolvable, origin: 'You' | 'I', channel: boolean): ContainerBuilder {
+    return this.full((builder) =>
+      builder.addTextDisplayComponents((b) =>
+        b.setContent([
+          `${origin} do not have the required permissions to perform this action${channel ? ` in this channel.` : '.'}.`,
+          '',
+          `**Missing Permissions**: ${permissions.toString()}`,
+        ].join('\n'))
+      )
+    );
+  }
+}

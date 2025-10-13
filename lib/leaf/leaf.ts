@@ -1,6 +1,6 @@
 import { ApplicationCommandOptionType, Events, type Guild } from 'discord.js';
 import type { DiscordFramework } from '../../mod.ts';
-import { injectCommandHandler } from './event/commandHandler.ts';
+import { injectCommandHandler } from './event/handler.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, LeafOption } from './types.ts';
 
 /**

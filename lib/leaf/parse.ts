@@ -2,7 +2,7 @@ import type { ChatInputCommandInteraction } from 'discord.js';
 import { ApplicationCommandOptionType } from 'discord.js';
 
 // Discord.js version: parses options from a ChatInputCommandInteraction
-export function commandOptionsParser(interaction: ChatInputCommandInteraction): Record<string, unknown> {
+export function parse(interaction: ChatInputCommandInteraction): Record<string, unknown> {
   const args: Record<string, unknown> = {};
 
   for (const option of interaction.options.data) {

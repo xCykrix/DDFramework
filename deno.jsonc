@@ -9,7 +9,8 @@
   // Imports
   "imports": {
     "ledger": "jsr:@ledger/ledger@0.1.9",
-    "discord.js": "npm:discord.js@15.0.0-dev.1760227315-180dd60c6"
+    "discord.js": "npm:discord.js@15.0.0-dev.1760227315-180dd60c6",
+    "@std/ulid": "jsr:@std/ulid@1.0.0"
   },
   "nodeModulesDir": "none",
   // Compiler Options

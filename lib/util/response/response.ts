@@ -1,5 +1,5 @@
-import { DiscordFramework } from '@amethyst/ddframework';
-import { ContainerBuilder, PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+import type { DiscordFramework } from '@amethyst/ddframework';
+import { ContainerBuilder, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 export class ResponseBuilder {
   public static full(callback: (builder: ContainerBuilder) => void): ContainerBuilder {

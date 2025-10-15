@@ -2,6 +2,7 @@ import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
 import { Ledger } from 'ledger';
 import { LeafManager } from './lib/leaf/leaf.ts';
 import { Partial } from './lib/partial.ts';
+import { StateManager } from './lib/state.ts';
 
 /**
  * Main entry point for the DiscordFramework, providing configuration, logging, and Discord.js client integration.
@@ -35,6 +36,11 @@ export class DiscordFramework {
    * The Discord.js client instance managed by the framework.
    */
   public djs: Client;
+
+  /**
+   * The StateManager instance for managing temporary state entries.
+   */
+  public state: StateManager;
 
   /**
    * The LeafManager instance for managing command leaves.
@@ -83,6 +89,7 @@ export class DiscordFramework {
         Partials.Reaction,
       ],
     });
+    this.state = new StateManager();
     this.leaf = new LeafManager(this);
     this.partial = new Partial(this);
   }

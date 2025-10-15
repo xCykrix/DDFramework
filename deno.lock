@@ -225,6 +225,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@ledger/ledger@0.1.9",
+      "jsr:@std/ulid@1.0.0",
       "npm:discord.js@15.0.0-dev.1760227315-180dd60c6"
     ]
   }

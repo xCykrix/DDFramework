@@ -1,5 +1,5 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
-import { GuildBasedChannel, GuildChannelType, GuildMember, MessageFlags } from 'discord.js';
+import { type GuildBasedChannel, type GuildChannelType, type GuildMember, MessageFlags } from 'discord.js';
 import { getFirstPathOfApplicationCommand } from '../../util/command.helper.ts';
 import { ResponseBuilder } from '../../util/response/response.ts';
 import { parse } from '../parse.ts';
@@ -140,6 +140,7 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       return;
     }
 
+    // Execute Callback
     await handler.callback({
       framework,
       interaction,

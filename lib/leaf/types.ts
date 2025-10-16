@@ -1,4 +1,4 @@
-import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalComponentResolver, ModalSubmitInteraction, PermissionResolvable, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
+import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelResolvable, GuildChannelType, GuildMember, MessageComponentInteraction, ModalComponentResolver, ModalSubmitInteraction, PermissionResolvable, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
 import type { DiscordFramework } from '../../mod.ts';
 
 export type LeafPrimitiveOption =
@@ -33,7 +33,7 @@ export type LeafTypeMap = {
   [ApplicationCommandOptionType.Number]: number;
   [ApplicationCommandOptionType.Boolean]: boolean;
   [ApplicationCommandOptionType.User]: User;
-  [ApplicationCommandOptionType.Channel]: Channel;
+  [ApplicationCommandOptionType.Channel]: GuildChannelResolvable;
   [ApplicationCommandOptionType.Role]: Role;
   [ApplicationCommandOptionType.Mentionable]: GuildMember | Role | User;
   [ApplicationCommandOptionType.Attachment]: Attachment;

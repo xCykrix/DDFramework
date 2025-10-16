@@ -1,26 +1,38 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
-import { ContainerBuilder, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+import { ContainerBuilder, type InteractionEditReplyOptions, MessageFlags, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 export class ResponseBuilder {
-  public static full(callback: (builder: ContainerBuilder) => void): ContainerBuilder {
+  public static full(callback: (builder: ContainerBuilder) => void): InteractionEditReplyOptions {
     const builder = new ContainerBuilder();
     callback(builder);
-    return builder
-      .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
-      .addTextDisplayComponents((b) =>
-        b.setContent(
-          `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
-        )
-      );
+    return {
+      flags: MessageFlags.IsComponentsV2,
+      components: [
+        builder
+          .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
+          .addTextDisplayComponents((b) =>
+            b.setContent(
+              `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
+            )
+          ),
+      ],
+    };
   }
 
-  public static fixed(content: string[]): ContainerBuilder {
-    return this.full(
-      (builder) =>
-        builder.addTextDisplayComponents(
-          (b) => b.setContent(content.join('\n')),
-        ),
-    );
+  public static fixed(content: string[]): InteractionEditReplyOptions {
+    return {
+      flags: MessageFlags.IsComponentsV2,
+      components: [
+        new ContainerBuilder()
+          .addTextDisplayComponents((b) => b.setContent(content.join('\n')))
+          .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
+          .addTextDisplayComponents((b) =>
+            b.setContent(
+              `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
+            )
+          ),
+      ],
+    };
   }
 
   public static internal(framework: DiscordFramework, message: string, context: Error): ContainerBuilder {

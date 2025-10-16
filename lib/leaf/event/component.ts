@@ -1,9 +1,10 @@
-import { DiscordFramework } from '@amethyst/ddframework';
+import type { DiscordFramework } from '@amethyst/ddframework';
 import { MessageFlags } from 'discord.js';
 import { ResponseBuilder } from '../../util/response/response.ts';
 
 export function injectComponentHandler(framework: DiscordFramework): void {
   framework.djs.on('interactionCreate', async (interaction) => {
+    // Verify Interaction is Processable by Handler.
     if (!interaction.isMessageComponent()) return;
     if (!interaction.customId) {
       await interaction.reply({
@@ -18,6 +19,8 @@ export function injectComponentHandler(framework: DiscordFramework): void {
       });
       return;
     }
+
+    // Get State or Reject Interaction.
     const state = framework.state.retrieve(interaction.customId, interaction.user.id);
     if (state === null) {
       await interaction.reply({
@@ -25,7 +28,7 @@ export function injectComponentHandler(framework: DiscordFramework): void {
         components: [
           ResponseBuilder.internal(
             framework,
-            'Invalid/Expired State of Callback Identifier.',
+            'Invalid/Expired State of Callback Identifier. Please issue the original request again.',
             new Deno.errors.NotFound('State not found or expired for Message Component Callback.'),
           ),
         ],
@@ -33,6 +36,7 @@ export function injectComponentHandler(framework: DiscordFramework): void {
       return;
     }
 
+    // Get Linked Options or Reject Interaction.
     const linkedOptions = framework.leaf.linkedOptions.get(state.groupId);
     if (!linkedOptions) {
       await interaction.reply({
@@ -48,21 +52,28 @@ export function injectComponentHandler(framework: DiscordFramework): void {
       return;
     }
 
+    // Check Linked Handler
     const linkedHandler = framework.leaf.linkedDynamics.get(state.groupId);
-    if (!linkedHandler) {
+    if (linkedHandler === undefined || linkedHandler.component === undefined) {
       await interaction.reply({
         flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
         components: [
           ResponseBuilder.internal(
             framework,
             'Linked handler not found for the callback identifier.',
-            new Deno.errors.NotFound('Linked handler not found for Message Component Callback.'),
+            new Deno.errors.NotFound('Linked handler or component callback not found for Message Component Callback.'),
           ),
         ],
       });
       return;
     }
 
-    // Further processing with linkedOptions and state.value can be done here.
+    // Execute Callback to Component.
+    await linkedHandler.component({
+      framework,
+      interaction,
+      customId: interaction.customId,
+      state,
+    });
   });
 }

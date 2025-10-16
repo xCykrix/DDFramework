@@ -6,6 +6,7 @@ import { parse } from '../parse.ts';
 
 export function injectCommandHandler(framework: DiscordFramework): void {
   framework.djs.on('interactionCreate', async (interaction) => {
+    // Verify Interaction is Processable by Handler.
     if (!interaction.isChatInputCommand()) return;
     if (interaction.guildId === null) return;
     if (interaction.channel?.isDMBased()) return;
@@ -14,11 +15,9 @@ export function injectCommandHandler(framework: DiscordFramework): void {
     // Extract Path
     const path = getFirstPathOfApplicationCommand(interaction);
     if (path === null) return;
-
-    // Late Validate
     if (interaction.commandName !== path?.split('.')[0]) return;
 
-    // Get Linked Options
+    // Get Linked Options.
     const options = framework.leaf.linkedOptions.get(path);
     if (options === undefined) {
       await interaction.reply({
@@ -34,9 +33,9 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       return;
     }
 
-    // Get Linked Handler
-    const handler = framework.leaf.linkedDynamics.get(path);
-    if (handler === undefined) {
+    // Get Linked Handler.
+    const linkedHandler = framework.leaf.linkedDynamics.get(path);
+    if (linkedHandler === undefined) {
       await interaction.reply({
         flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
         components: [
@@ -50,7 +49,7 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       return;
     }
 
-    // Get Types
+    // Build Passthrough Variables.
     const channel = await framework.partial.channel(interaction.channel) as GuildBasedChannel;
     const invoker = await framework.partial.guildMember(interaction.member as GuildMember);
     const bot = await framework.partial.guildMember(interaction.guild!.members.me as GuildMember);
@@ -68,7 +67,7 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       return;
     }
 
-    // Check Channel Types
+    // Check Channel Types.
     if (!options.channelTypesRequired.includes(channel.type as GuildChannelType)) {
       await interaction.reply({
         flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
@@ -83,7 +82,7 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       return;
     }
 
-    // Check Permissions
+    // Check Permissions.
     if (!invoker.permissions.has(options.guild.userRequiredGuildPermissions)) {
       await interaction.reply({
         flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
@@ -140,8 +139,8 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       return;
     }
 
-    // Execute Callback
-    await handler.callback({
+    // Execute Callback.
+    await linkedHandler.callback({
       framework,
       interaction,
       guild: interaction.guild!,

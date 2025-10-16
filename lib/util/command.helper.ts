@@ -1,4 +1,4 @@
-import { type ChatInputCommandInteraction } from 'discord.js';
+import { AutocompleteInteraction, type ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * Extracts the full path of a Discord application command from an interaction object.
@@ -10,7 +10,7 @@ import { type ChatInputCommandInteraction } from 'discord.js';
  * @example
  * // For a command /foo bar baz, returns 'foo.bar.baz'
  */
-export function getFirstPathOfApplicationCommand(interaction: ChatInputCommandInteraction): string | null {
+export function getFirstPathOfApplicationCommand(interaction: ChatInputCommandInteraction | AutocompleteInteraction): string | null {
   let path = '';
 
   const parts = {

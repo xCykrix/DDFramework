@@ -73,18 +73,16 @@ export type AutoCompleteResponse = {
   allowEmptySearch?: boolean;
 };
 
-export type LeafHandlerContext<T extends ChatInputCommandJSON> = {
-  framework: DiscordFramework;
-  interaction: ChatInputCommandInteraction;
-  guild: Guild;
-  channel: GuildBasedChannel;
-  invoker: GuildMember;
-  bot: GuildMember;
-  args: ChatInputArgs<T>;
-};
-
 export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
-  callback(passthrough: LeafHandlerContext<V>): Promise<void>;
+  callback(passthrough: {
+    framework: DiscordFramework;
+    interaction: ChatInputCommandInteraction;
+    guild: Guild;
+    channel: GuildBasedChannel;
+    invoker: GuildMember;
+    bot: GuildMember;
+    args: ChatInputArgs<V>;
+  }): Promise<void>;
   component?(passthrough: {
     framework: DiscordFramework;
     interaction: MessageComponentInteraction | ModalSubmitInteraction;
@@ -99,6 +97,7 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
     state: unknown | null;
   }): Promise<void>;
   autocomplete?(passthrough: {
+    framework: DiscordFramework;
     interaction: AutocompleteInteraction;
     focused: unknown;
   }): Promise<AutoCompleteResponse | null>;

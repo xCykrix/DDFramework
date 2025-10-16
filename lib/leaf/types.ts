@@ -1,4 +1,4 @@
-import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalSubmitInteraction, PermissionResolvable, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
+import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, Channel, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalComponentResolver, ModalSubmitInteraction, PermissionResolvable, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
 import type { DiscordFramework } from '../../mod.ts';
 
 export type LeafPrimitiveOption =
@@ -93,7 +93,7 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
     framework: DiscordFramework;
     interaction: ModalSubmitInteraction;
     customId: string;
-    modal: Map<string, string> | null;
+    resolver: ModalComponentResolver;
     state: unknown | null;
   }): Promise<void>;
   autocomplete?(passthrough: {

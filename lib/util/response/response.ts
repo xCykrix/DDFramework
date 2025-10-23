@@ -35,7 +35,7 @@ export class ResponseBuilder {
     };
   }
 
-  public static internal(framework: DiscordFramework, message: string, context: Error): ContainerBuilder {
+  public static internal(framework: DiscordFramework, message: string, context: Error): InteractionEditReplyOptions {
     const id = crypto.randomUUID();
     framework.ledger.severe(`[${id}] Internal Error Response - ${message}`, {
       err: context,
@@ -54,7 +54,7 @@ export class ResponseBuilder {
     );
   }
 
-  public static permission(permissions: PermissionResolvable, origin: 'You' | 'I', channel: boolean): ContainerBuilder {
+  public static permission(permissions: PermissionResolvable, origin: 'You' | 'I', channel: boolean): InteractionEditReplyOptions {
     return this.full((builder) =>
       builder.addTextDisplayComponents((b) =>
         b.setContent([

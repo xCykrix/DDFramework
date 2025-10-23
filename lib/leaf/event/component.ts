@@ -55,16 +55,13 @@ export function injectComponentHandler(framework: DiscordFramework): void {
     // Check Linked Handler
     const linkedHandler = framework.leaf.linkedDynamics.get(state.groupId);
     if (linkedHandler === undefined || linkedHandler.component === undefined) {
-      await interaction.reply({
-        flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
-        components: [
-          ResponseBuilder.internal(
-            framework,
-            'Linked handler not found for the callback identifier.',
-            new Deno.errors.NotFound('Linked handler or component callback not found for Message Component Callback.'),
-          ),
-        ],
-      });
+      await interaction.reply(
+        ResponseBuilder.internal(
+          framework,
+          'Linked handler not found for the callback identifier.',
+          new Deno.errors.NotFound('Linked handler or component callback not found for Message Component Callback.'),
+        ),
+      );
       return;
     }
 

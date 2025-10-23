@@ -1,8 +1,8 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
-import { ContainerBuilder, type InteractionEditReplyOptions, MessageFlags, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+import { ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, MessageFlags, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 export class ResponseBuilder {
-  public static full(callback: (builder: ContainerBuilder) => void): InteractionEditReplyOptions {
+  public static full(callback: (builder: ContainerBuilder) => void): InteractionReplyOptions | InteractionEditReplyOptions {
     const builder = new ContainerBuilder();
     callback(builder);
     return {
@@ -19,7 +19,7 @@ export class ResponseBuilder {
     };
   }
 
-  public static fixed(content: string[]): InteractionEditReplyOptions {
+  public static fixed(content: string[]): InteractionReplyOptions | InteractionEditReplyOptions {
     return {
       flags: MessageFlags.IsComponentsV2,
       components: [
@@ -35,7 +35,7 @@ export class ResponseBuilder {
     };
   }
 
-  public static internal(framework: DiscordFramework, message: string, context: Error): InteractionEditReplyOptions {
+  public static internal(framework: DiscordFramework, message: string, context: Error): InteractionReplyOptions | InteractionEditReplyOptions {
     const id = crypto.randomUUID();
     framework.ledger.severe(`[${id}] Internal Error Response - ${message}`, {
       err: context,
@@ -54,7 +54,7 @@ export class ResponseBuilder {
     );
   }
 
-  public static permission(permissions: PermissionResolvable, origin: 'You' | 'I', channel: boolean): InteractionEditReplyOptions {
+  public static permission(permissions: PermissionResolvable, origin: 'You' | 'I', channel: boolean): InteractionReplyOptions | InteractionEditReplyOptions {
     return this.full((builder) =>
       builder.addTextDisplayComponents((b) =>
         b.setContent([

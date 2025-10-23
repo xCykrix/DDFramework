@@ -7,15 +7,22 @@ export function injectComponentHandler(framework: DiscordFramework): void {
     // Verify Interaction is Processable by Handler.
     if (!interaction.isMessageComponent()) return;
     if (!interaction.customId) {
-      await interaction.reply({
-        flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
-        components: [
-          ResponseBuilder.internal(
+      await interaction.editReply(
+        ResponseBuilder.internal(
             framework,
             'Missing Callback Identifier. This is likely a bug.',
             new Deno.errors.NotFound('Unable to find customId for Message Component Callback'),
           ),
-        ],
+      );
+      return;
+    }
+
+    // Get State or Reject Interaction.
+    const state = framework.state.retrieve(interaction.customId, interaction.user.id);
+    if (state === null) {
+      await interaction.reply({
+        flags: MessageFlags.IsComponentsV2 | MessageFlags.Ephemeral,
+        components: [
       });
       return;
     }

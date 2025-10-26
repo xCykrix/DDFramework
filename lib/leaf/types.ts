@@ -119,8 +119,9 @@ export type HandlerOptions = {
   };
 };
 
-export interface LeafDefinition<T extends ChatInputCommandJSON> {
+export interface LeafDefinition<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON> {
   schema: T;
+  literal: V;
   options: HandlerOptions;
-  handler: DynamicInjectedHandler<T>;
+  handler: DynamicInjectedHandler<V>;
 }

@@ -83,11 +83,11 @@ export class LeafManager {
    * @typeParam T - The command schema type.
    * @param definition - The leaf definition to register.
    */
-  public linkLeaf<T extends ChatInputCommandJSON>(definition: LeafDefinition<T>): void {
-    for (const path of this.iterateCommandPaths(definition.schema.name, definition.schema.options)) {
+  public linkLeaf<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(definition: LeafDefinition<T, V>): void {
+    for (const path of this.iterateCommandPaths(definition.literal.name, definition.literal.options)) {
       this.framework.ledger.trace('[TraceInitialize] linkLeaf()', {
-        name: definition.schema.name,
-        options: definition.schema.options,
+        name: definition.literal.name,
+        options: definition.literal.options,
         path,
       });
       this.registerLink(path, definition);
@@ -98,7 +98,7 @@ export class LeafManager {
       this.registerLink(componentPath, definition);
     }
 
-    this.mergeSchema(definition.schema.name, definition.schema);
+    this.addLinkedSchema(definition.schema.name, definition.schema);
   }
 
   /**
@@ -152,7 +152,7 @@ export class LeafManager {
    * @param name - The command name.
    * @param schema - The command schema to merge.
    */
-  private mergeSchema(name: string, schema: ChatInputCommandJSON): void {
+  private addLinkedSchema(name: string, schema: ChatInputCommandJSON): void {
     // For now, last write wins. If merge semantics are needed, reintroduce a custom merge.
     this.linkedSchemas.set(name, schema);
   }

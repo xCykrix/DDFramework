@@ -1,5 +1,5 @@
 import { ulid } from '@std/ulid';
-import { MapWithExpiration } from '@amethyst/ddframework/lib/util/cache/mapWithExpiration.ts';
+import { MapWithExpiration } from './util/cache/mapWithExpiration.ts';
 
 /**
  * Options for managing state entries in StateManager.

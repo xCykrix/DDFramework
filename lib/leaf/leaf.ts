@@ -139,7 +139,7 @@ export class LeafManager {
    * @param path - The command/component path or custom ID.
    * @param definition - The leaf definition containing handler and options.
    */
-  private registerLink<T extends ChatInputCommandJSON>(path: string, definition: LeafDefinition<T>): void {
+  private registerLink<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(path: string, definition: LeafDefinition<T, V>): void {
     this.linkedDynamics.set(path, definition.handler as DynamicInjectedHandler<ChatInputCommandJSON>);
     this.linkedOptions.set(path, definition.options);
   }

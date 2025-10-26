@@ -124,5 +124,5 @@ export interface LeafDefinition<T extends ChatInputCommandJSON, V extends ChatIn
   literal: V;
   namespace: string;
   options: HandlerOptions;
-  handler: DynamicInjectedHandler<V>;
+  handler: DynamicInjectedHandler<T>;
 }

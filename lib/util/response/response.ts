@@ -2,7 +2,13 @@ import type { DiscordFramework } from '@amethyst/ddframework';
 import { type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 export class ResponseBuilder {
-  public static async handle(interaction: ChatInputCommandInteraction | MessageComponentInteraction | ModalSubmitInteraction, options: InteractionReplyOptions | InteractionEditReplyOptions): Promise<void> {
+  public static async handle(
+    interaction:
+      | ChatInputCommandInteraction
+      | MessageComponentInteraction
+      | ModalSubmitInteraction,
+    options: InteractionReplyOptions | InteractionEditReplyOptions,
+  ): Promise<void> {
     if (interaction.replied || interaction.deferred) {
       await interaction.editReply(options as InteractionEditReplyOptions);
     } else {
@@ -10,7 +16,9 @@ export class ResponseBuilder {
     }
   }
 
-  public static full(callback: (builder: ContainerBuilder) => void): InteractionEditReplyOptions {
+  public static full(
+    callback: (builder: ContainerBuilder) => void,
+  ): InteractionEditReplyOptions {
     const builder = new ContainerBuilder();
     callback(builder);
     return {
@@ -43,7 +51,11 @@ export class ResponseBuilder {
     };
   }
 
-  public static internal(framework: DiscordFramework, message: string, context: Error): InteractionEditReplyOptions {
+  public static internal(
+    framework: DiscordFramework,
+    message: string,
+    context: Error,
+  ): InteractionEditReplyOptions {
     const id = crypto.randomUUID();
     framework.ledger.severe(`[${id}] Internal Error Response - ${message}`, {
       err: context,
@@ -62,7 +74,11 @@ export class ResponseBuilder {
     );
   }
 
-  public static permission(permissions: PermissionResolvable, origin: 'You' | 'I', channel: boolean): InteractionEditReplyOptions {
+  public static permission(
+    permissions: PermissionResolvable,
+    origin: 'You' | 'I',
+    channel: boolean,
+  ): InteractionEditReplyOptions {
     return this.full((builder) =>
       builder.addTextDisplayComponents((b) =>
         b.setContent([

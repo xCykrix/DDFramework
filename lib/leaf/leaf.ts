@@ -85,6 +85,11 @@ export class LeafManager {
    */
   public linkLeaf<T extends ChatInputCommandJSON>(definition: LeafDefinition<T>): void {
     for (const path of this.iterateCommandPaths(definition.schema.name, definition.schema.options)) {
+      this.framework.ledger.trace('[TraceInitialize] linkLeaf()', {
+        name: definition.schema.name,
+        options: definition.schema.options,
+        path,
+      });
       this.registerLink(path, definition);
     }
 

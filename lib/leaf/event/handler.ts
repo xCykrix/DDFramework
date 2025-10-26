@@ -1,5 +1,5 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
-import { type GuildBasedChannel, type GuildChannelType, type GuildMember } from 'discord.js';
+import type { GuildBasedChannel, GuildChannelType, GuildMember } from 'discord.js';
 import { getFirstPathOfApplicationCommand } from '../../util/internal/getFirstPathOfApplicationCommand.ts';
 import { ResponseBuilder } from '../../util/response/response.ts';
 import { parse } from '../parse.ts';

@@ -1,6 +1,9 @@
 import { ApplicationCommandOptionType, Events, type Guild } from 'discord.js';
 import type { DiscordFramework } from '../../mod.ts';
+import { injectAutoCompleteHandler } from './event/autocomplete.ts';
+import { injectComponentHandler } from './event/component.ts';
 import { injectCommandHandler } from './event/handler.ts';
+import { injectModalHandler } from './event/modal.ts';
 import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, LeafDefinition, LeafOption } from './types.ts';
 
 /**
@@ -43,6 +46,9 @@ export class LeafManager {
     this.framework = framework;
 
     injectCommandHandler(this.framework);
+    injectComponentHandler(this.framework);
+    injectAutoCompleteHandler(this.framework);
+    injectModalHandler(this.framework);
 
     // On ready, register commands per guild using Discord.js
     this.framework.djs.once(Events.ClientReady, async () => {
@@ -84,7 +90,7 @@ export class LeafManager {
    * @param definition - The leaf definition to register.
    */
   public linkLeaf<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(definition: LeafDefinition<T, V>): void {
-    for (const path of this.iterateCommandPaths(definition.literal.name, definition.literal.options)) {
+    for (const path of this.iterateCommandPaths(definition.literal.name, definition.literal.options, definition.namespace)) {
       this.framework.ledger.trace('[TraceInitialize] linkLeaf()', {
         name: definition.literal.name,
         options: definition.literal.options,
@@ -112,7 +118,8 @@ export class LeafManager {
    */
   private *iterateCommandPaths(
     base: string,
-    options?: readonly LeafOption[],
+    options: readonly LeafOption[] | undefined,
+    namespace: string,
   ): Generator<string, void, undefined> {
     yield base;
     if (!options) return;
@@ -122,10 +129,10 @@ export class LeafManager {
         option.type === ApplicationCommandOptionType.Subcommand ||
         option.type === ApplicationCommandOptionType.SubcommandGroup
       ) {
-        const currentPath = `${base}.${option.name}`;
+        const currentPath = `${namespace}.${base}.${option.name}`;
         yield currentPath;
         if ('options' in option && Array.isArray(option.options)) {
-          yield* this.iterateCommandPaths(currentPath, option.options);
+          yield* this.iterateCommandPaths(currentPath, option.options, namespace);
         }
       }
     }

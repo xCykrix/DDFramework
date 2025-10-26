@@ -3,7 +3,7 @@ import uFuzzy from '@ufuzzy';
 import { APIApplicationCommandOptionChoice } from 'discord.js';
 import { getFirstPathOfApplicationCommand } from '../../util/internal/getFirstPathOfApplicationCommand.ts';
 
-export function injectComponentHandler(framework: DiscordFramework): void {
+export function injectAutoCompleteHandler(framework: DiscordFramework): void {
   framework.djs.on('interactionCreate', async (interaction) => {
     // Verify Interaction is Processable by Handler.
     if (!interaction.isAutocomplete()) return;

@@ -122,6 +122,7 @@ export type HandlerOptions = {
 export interface LeafDefinition<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON> {
   schema: T;
   literal: V;
+  namespace: string;
   options: HandlerOptions;
   handler: DynamicInjectedHandler<V>;
 }

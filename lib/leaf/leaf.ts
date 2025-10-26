@@ -121,7 +121,7 @@ export class LeafManager {
     options: readonly LeafOption[] | undefined,
     namespace: string,
   ): Generator<string, void, undefined> {
-    yield base;
+    yield `${namespace}.${base}`;
     if (!options) return;
 
     for (const option of options) {

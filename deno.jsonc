@@ -1,13 +1,11 @@
 {
   "name": "@amethyst/ddframework",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",
-    "./lib/leaf/types.ts": "./lib/leaf/types.ts",
-    "./lib/util/response/response.ts": "./lib/util/response/response.ts",
-    "./lib/util/cache/mapWithExpiration.ts": "./lib/util/cache/mapWithExpiration.ts",
-    "./lib/util/cache/setWithExpiration.ts": "./lib/util/cache/setWithExpiration.ts",
+    "./lib/types.ts": "./lib/leaf/types.ts",
+    "./lib/utils.ts": "./lib/utils.ts",
   },
   // Imports
   "imports": {

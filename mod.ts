@@ -1,8 +1,8 @@
 import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
 import { Ledger } from 'ledger';
 import { LeafManager } from './lib/leaf/leaf.ts';
-import { Partial } from './lib/partial.ts';
-import { StateManager } from './lib/state.ts';
+import { Partial } from './lib/util/helper/partial.ts';
+import { StateManager } from './lib/util/state/state.ts';
 
 /**
  * Main entry point for the DiscordFramework, providing configuration, logging, and Discord.js client integration.

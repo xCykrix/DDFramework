@@ -1,5 +1,5 @@
 import type { Channel, GuildMember, Message, MessageReaction, User } from 'discord.js';
-import type { DiscordFramework } from '../mod.ts';
+import type { DiscordFramework } from '../../../mod.ts';
 /**
  * Resolves Discord.js partial objects to their complete forms by fetching them if necessary.
  *
@@ -58,22 +58,22 @@ export class Partial {
 
   /**
    * Resolves a possibly-partial GuildMember to a full GuildMember object.
-   * @param guildMember The GuildMember or partial GuildMember instance.
+   * @param member The GuildMember or partial GuildMember instance.
    * @returns The full GuildMember, or null if not found or fetch fails.
    * @see {@link https://discord.js.org/#/docs/main/stable/class/GuildMember}
    */
-  public async guildMember(guildMember: GuildMember | null): Promise<GuildMember | null> {
-    if (guildMember === null) return null;
-    if (guildMember.partial) {
-      guildMember = await guildMember.fetch().catch((e) => {
+  public async member(member: GuildMember | null): Promise<GuildMember | null> {
+    if (member === null) return null;
+    if (member.partial) {
+      member = await member.fetch().catch((e) => {
         this.framework.ledger.warning(`Failed to fetch a partial guild member.`, {
           error: e,
-          id: guildMember!.id,
+          id: member!.id,
         });
         return null;
       });
     }
-    return guildMember;
+    return member;
   }
 
   /**

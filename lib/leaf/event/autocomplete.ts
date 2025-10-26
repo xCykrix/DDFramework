@@ -1,7 +1,7 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
 import uFuzzy from '@ufuzzy';
 import { APIApplicationCommandOptionChoice } from 'discord.js';
-import { getFirstPathOfApplicationCommand } from '../../util/command.helper.ts';
+import { getFirstPathOfApplicationCommand } from '../../util/internal/getFirstPathOfApplicationCommand.ts';
 
 export function injectComponentHandler(framework: DiscordFramework): void {
   framework.djs.on('interactionCreate', async (interaction) => {

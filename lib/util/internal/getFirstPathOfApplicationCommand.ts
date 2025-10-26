@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, type ChatInputCommandInteraction } from 'discord.js';
+import type { AutocompleteInteraction, ChatInputCommandInteraction } from 'discord.js';
 
 /**
  * Extracts the full path of a Discord application command from an interaction object.

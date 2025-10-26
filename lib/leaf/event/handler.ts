@@ -1,6 +1,6 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
 import { type GuildBasedChannel, type GuildChannelType, type GuildMember } from 'discord.js';
-import { getFirstPathOfApplicationCommand } from '../../util/command.helper.ts';
+import { getFirstPathOfApplicationCommand } from '../../util/internal/getFirstPathOfApplicationCommand.ts';
 import { ResponseBuilder } from '../../util/response/response.ts';
 import { parse } from '../parse.ts';
 
@@ -47,8 +47,8 @@ export function injectCommandHandler(framework: DiscordFramework): void {
 
     // Build Passthrough Variables.
     const channel = await framework.partial.channel(interaction.channel) as GuildBasedChannel;
-    const invoker = await framework.partial.guildMember(interaction.member as GuildMember);
-    const bot = await framework.partial.guildMember(interaction.guild!.members.me as GuildMember);
+    const invoker = await framework.partial.member(interaction.member as GuildMember);
+    const bot = await framework.partial.member(interaction.guild!.members.me as GuildMember);
     if (channel === null || invoker === null || bot === null) {
       await ResponseBuilder.handle(
         interaction,

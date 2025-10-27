@@ -18,45 +18,30 @@ import { StateManager } from './lib/util/state/state.ts';
  * const framework = new DiscordFramework({ tenantId: 'my-tenant', token: 'my-token' });
  * await framework.start();
  * ```
- *
- * @category Core
  */
 export class DiscordFramework {
-  /**
-   * The Ledger instance for logging and diagnostics.
-   */
+  /** The Ledger instance for logging and diagnostics. */
   public ledger: Ledger;
 
-  /**
-   * The options used to configure the framework instance.
-   */
+  /** The options used to configure the framework instance. */
   public options: FrameworkOptions;
 
-  /**
-   * The Discord.js client instance managed by the framework.
-   */
+  /** The Discord.js client instance managed by the framework. */
   public djs: Client;
 
-  /**
-   * The StateManager instance for managing temporary state entries.
-   */
+  /** The StateManager instance for managing temporary state entries. */
   public state: StateManager;
 
-  /**
-   * The LeafManager instance for managing command leaves.
-   */
+  /** The LeafManager instance for managing command leaves. */
   public leaf: LeafManager;
 
-  /**
-   * Helper for resolving Discord.js partial structures.
-   * @see {@link Partial}
-   */
+  /** Helper for resolving Discord.js partial structures. */
   public partial: Partial;
 
   /**
    * Creates a new DiscordFramework instance.
    *
-   * @param options Configuration options for the framework.
+   * @param options - Configuration options for the framework.
    */
   public constructor(options: FrameworkOptions) {
     this.options = options;
@@ -117,6 +102,8 @@ export class DiscordFramework {
  * Options for configuring the DiscordFramework instance.
  */
 export interface FrameworkOptions {
+  /** The tenant/service identifier for logging and context. */
   tenantId: string;
+  /** The Discord bot token to use for login. */
   token: string;
 }

@@ -1,7 +1,13 @@
-import type { ChatInputCommandInteraction } from 'discord.js';
+import type { ChatInputCommandInteraction, CommandInteractionOption } from 'discord.js';
 import { ApplicationCommandOptionType } from 'discord.js';
 
-// Discord.js version: parses options from a ChatInputCommandInteraction
+/**
+ * Parses all options from a ChatInputCommandInteraction into a plain object.
+ * Handles subcommands, subcommand groups, and all option types recursively.
+ *
+ * @param interaction - The Discord.js ChatInputCommandInteraction to parse.
+ * @returns An object mapping option names to their resolved values.
+ */
 export function parse(interaction: ChatInputCommandInteraction): Record<string, unknown> {
   const args: Record<string, unknown> = {};
 
@@ -28,9 +34,17 @@ export function parse(interaction: ChatInputCommandInteraction): Record<string, 
   return args;
 }
 
-import type { CommandInteractionOption } from 'discord.js';
-
-function parseSubcommandOptions(interaction: ChatInputCommandInteraction, options: readonly CommandInteractionOption[]): Record<string, unknown> {
+/**
+ * Parses options for a subcommand into a plain object.
+ *
+ * @param interaction - The parent ChatInputCommandInteraction.
+ * @param options - The options array for the subcommand.
+ * @returns An object mapping option names to their resolved values.
+ */
+function parseSubcommandOptions(
+  interaction: ChatInputCommandInteraction,
+  options: readonly CommandInteractionOption[],
+): Record<string, unknown> {
   const args: Record<string, unknown> = {};
   for (const option of options) {
     args[option.name] = resolveOptionValue(interaction, option);
@@ -38,7 +52,17 @@ function parseSubcommandOptions(interaction: ChatInputCommandInteraction, option
   return args;
 }
 
-function resolveOptionValue(interaction: ChatInputCommandInteraction, option: CommandInteractionOption): unknown {
+/**
+ * Resolves the value of a single command option, handling Discord.js option types.
+ *
+ * @param interaction - The parent ChatInputCommandInteraction.
+ * @param option - The option to resolve.
+ * @returns The resolved value for the option, or null if not found.
+ */
+function resolveOptionValue(
+  interaction: ChatInputCommandInteraction,
+  option: CommandInteractionOption,
+): unknown {
   switch (option.type) {
     case ApplicationCommandOptionType.User:
       return interaction.options.getUser(option.name) ?? null;

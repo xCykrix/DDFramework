@@ -4,6 +4,16 @@ import type { APIApplicationCommandOptionChoice } from 'discord.js';
 import { getFirstPathOfApplicationCommand } from '../../util/internal/getFirstPathOfApplicationCommand.ts';
 import { intercept } from '../intercept.ts';
 
+/**
+ * Injects a handler for Discord.js autocomplete interactions into the framework.
+ *
+ * This function listens for 'interactionCreate' events, filters for autocomplete interactions,
+ * validates the interaction, retrieves state and handler, and invokes the autocomplete callback.
+ *
+ * All errors and invalid states are handled with warnings or are logged via the framework's ledger.
+ *
+ * @param framework - The DiscordFramework instance to inject the handler into.
+ */
 export function injectAutoCompleteHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',

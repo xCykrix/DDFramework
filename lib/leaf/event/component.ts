@@ -2,6 +2,16 @@ import type { DiscordFramework } from '@amethyst/ddframework';
 import { ResponseBuilder } from '../../util/response/response.ts';
 import { intercept } from '../intercept.ts';
 
+/**
+ * Injects a handler for Discord.js message component interactions into the framework.
+ *
+ * This function listens for 'interactionCreate' events, filters for message components,
+ * validates the interaction, retrieves state and handler, and invokes the component callback.
+ *
+ * All errors and invalid states are handled with internal responses and logged via the framework's ledger.
+ *
+ * @param framework - The DiscordFramework instance to inject the handler into.
+ */
 export function injectComponentHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',

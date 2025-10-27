@@ -6,11 +6,11 @@ import type { DiscordFramework } from '@amethyst/ddframework';
  * This utility is intended for use with Discord.js event handlers or any async callback
  * where unhandled promise rejections should be logged instead of crashing the process.
  *
- * @template T - The argument types for the event handler
- * @param framework - The DiscordFramework instance for logging errors
- * @param id - A unique identifier for the handler, used in error logs
- * @param asyncListener - The async function to wrap
- * @returns A synchronous function that invokes the async handler and logs any errors
+ * @typeParam T - The argument types for the event handler.
+ * @param framework - The DiscordFramework instance for logging errors.
+ * @param id - A unique identifier for the handler, used in error logs.
+ * @param asyncListener - The async function to wrap.
+ * @returns A synchronous function that invokes the async handler and logs any errors.
  *
  * @example
  * client.on('messageCreate', intercept(framework, 'messageCreate', async (msg) => {

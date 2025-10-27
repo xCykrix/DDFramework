@@ -15,23 +15,23 @@ import type { ChatInputCommandJSON, DynamicInjectedHandler, HandlerOptions, Leaf
  * Used internally by DDFramework. Not intended for direct initialization by end-users.
  */
 export class LeafManager {
+  /**
+   * The DiscordFramework instance this manager is bound to.
+   */
   private framework: DiscordFramework;
 
   /**
    * Maps command names to their registered command schemas.
-   *
    * Used for upserting application commands to Discord guilds.
    */
   public linkedSchemas: Map<string, ChatInputCommandJSON> = new Map();
   /**
    * Maps command/component paths to their handler options.
-   *
    * Used for permission checks and handler invocation.
    */
   public linkedOptions: Map<string, HandlerOptions> = new Map();
   /**
    * Maps command/component paths to their dynamic handler implementations.
-   *
    * Used for routing interactions to the correct callback.
    */
   public linkedDynamics: Map<string, DynamicInjectedHandler<ChatInputCommandJSON>> = new Map();
@@ -40,7 +40,6 @@ export class LeafManager {
    * Constructs a LeafManager and wires up all interaction handlers.
    *
    * @param framework - The bot instance to manage leaves for.
-   * @param options - The options for the leaf manager.
    */
   public constructor(framework: DiscordFramework) {
     this.framework = framework;
@@ -69,7 +68,17 @@ export class LeafManager {
     });
   }
 
-  private async registerGuildCommands(guild: Guild, schemas: ChatInputCommandJSON[]): Promise<void> {
+  /**
+   * Registers all commands for a given guild using Discord.js REST API.
+   *
+   * @param guild - The guild to register commands for.
+   * @param schemas - The array of command schemas to register.
+   * @returns A promise that resolves when commands are registered.
+   */
+  private async registerGuildCommands(
+    guild: Guild,
+    schemas: ChatInputCommandJSON[],
+  ): Promise<void> {
     try {
       await guild.commands.set(schemas);
       this.framework.ledger.information(`[LeafManager] Upserted ${schemas.length} commands to guild ${guild.id}`);
@@ -86,10 +95,13 @@ export class LeafManager {
    *
    * Adds all dynamic paths and component IDs to the internal handler maps, and merges schemas for upsert.
    *
-   * @typeParam T - The command schema type.
+   * @typeParam T - The command schema type (literal, for path iteration)
+   * @typeParam V - The command schema type (schema, for upsert)
    * @param definition - The leaf definition to register.
    */
-  public linkLeaf<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(definition: LeafDefinition<T, V>): void {
+  public linkLeaf<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(
+    definition: LeafDefinition<T, V>,
+  ): void {
     for (const path of this.iterateCommandPaths(definition.literal.name, definition.literal.options, definition.namespace)) {
       this.framework.ledger.trace('[TraceInitialize] linkLeaf()', {
         name: definition.literal.name,
@@ -114,7 +126,8 @@ export class LeafManager {
    *
    * @param base - The base path to start from.
    * @param options - The options to extract paths from.
-   * @returns Generator of dynamic path strings.
+   * @param namespace - The namespace prefix for the path.
+   * @yields Dynamic path strings for commands/components.
    */
   private *iterateCommandPaths(
     base: string,
@@ -146,21 +159,26 @@ export class LeafManager {
    * @param path - The command/component path or custom ID.
    * @param definition - The leaf definition containing handler and options.
    */
-  private registerLink<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(path: string, definition: LeafDefinition<T, V>): void {
+  private registerLink<T extends ChatInputCommandJSON, V extends ChatInputCommandJSON>(
+    path: string,
+    definition: LeafDefinition<T, V>,
+  ): void {
     this.linkedDynamics.set(path, definition.handler as DynamicInjectedHandler<ChatInputCommandJSON>);
     this.linkedOptions.set(path, definition.options);
   }
 
   /**
-   * Merges a command schema into the linkedSchemas map, combining with any existing schema.
+   * Adds a command schema to the linkedSchemas map for upsert.
    *
-   * Ensures unique array values and combines sets/maps for Discord application command upsert.
+   * For now, last write wins. If merge semantics are needed, reintroduce a custom merge.
    *
    * @param name - The command name.
-   * @param schema - The command schema to merge.
+   * @param schema - The command schema to add.
    */
-  private addLinkedSchema(name: string, schema: ChatInputCommandJSON): void {
-    // For now, last write wins. If merge semantics are needed, reintroduce a custom merge.
+  private addLinkedSchema(
+    name: string,
+    schema: ChatInputCommandJSON,
+  ): void {
     this.linkedSchemas.set(name, schema);
   }
 }

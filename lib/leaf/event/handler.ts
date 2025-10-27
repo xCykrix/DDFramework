@@ -5,6 +5,17 @@ import { ResponseBuilder } from '../../util/response/response.ts';
 import { intercept } from '../intercept.ts';
 import { parse } from '../parse.ts';
 
+/**
+ * Injects a handler for Discord.js chat input command interactions into the framework.
+ *
+ * This function listens for 'interactionCreate' events, filters for chat input commands,
+ * validates the interaction, checks permissions and channel types, retrieves the handler,
+ * and invokes the command callback with all required context.
+ *
+ * All errors and invalid states are handled with internal responses and logged via the framework's ledger.
+ *
+ * @param framework - The DiscordFramework instance to inject the handler into.
+ */
 export function injectCommandHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',

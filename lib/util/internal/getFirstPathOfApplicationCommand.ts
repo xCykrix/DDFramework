@@ -5,12 +5,16 @@ import type { AutocompleteInteraction, ChatInputCommandInteraction } from 'disco
  *
  * Traverses subcommands and subcommand groups to build a dot-separated path string.
  *
- * @param interaction - The Discord interaction object.
- * @returns The full command path as a string, or null if not found.
+ * @param interaction - The Discord.js interaction object (chat input or autocomplete).
+ * @returns The full command path as a string (e.g., 'foo.bar.baz'), or null if not found.
+ *
  * @example
  * // For a command /foo bar baz, returns 'foo.bar.baz'
+ * const path = getFirstPathOfApplicationCommand(interaction);
  */
-export function getFirstPathOfApplicationCommand(interaction: ChatInputCommandInteraction | AutocompleteInteraction): string | null {
+export function getFirstPathOfApplicationCommand(
+  interaction: ChatInputCommandInteraction | AutocompleteInteraction,
+): string | null {
   let path = '';
 
   const parts = {

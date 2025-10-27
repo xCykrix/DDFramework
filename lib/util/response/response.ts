@@ -1,7 +1,18 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
 import { type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
+/**
+ * Utility class for building and sending Discord.js interaction responses.
+ *
+ * Provides helpers for replying, editing, and formatting error and permission messages.
+ */
 export class ResponseBuilder {
+  /**
+   * Sends or edits a reply to a Discord interaction, depending on its state.
+   *
+   * @param interaction - The interaction to respond to (chat, component, or modal).
+   * @param options - The reply or edit options.
+   */
   public static async handle(
     interaction:
       | ChatInputCommandInteraction
@@ -16,6 +27,12 @@ export class ResponseBuilder {
     }
   }
 
+  /**
+   * Builds a full interaction reply with custom components and a timestamp.
+   *
+   * @param callback - Function to configure the ContainerBuilder.
+   * @returns The reply options for editing or replying to an interaction.
+   */
   public static full(
     callback: (builder: ContainerBuilder) => void,
   ): InteractionEditReplyOptions {
@@ -35,6 +52,12 @@ export class ResponseBuilder {
     };
   }
 
+  /**
+   * Builds a fixed-content interaction reply with a timestamp.
+   *
+   * @param content - The lines of content to display.
+   * @returns The reply options for editing or replying to an interaction.
+   */
   public static fixed(content: string[]): InteractionEditReplyOptions {
     return {
       flags: MessageFlags.IsComponentsV2,
@@ -51,6 +74,14 @@ export class ResponseBuilder {
     };
   }
 
+  /**
+   * Builds an internal error response and logs the error with a unique support ID.
+   *
+   * @param framework - The DiscordFramework instance for logging.
+   * @param message - The error message to display.
+   * @param context - The error context (exception object).
+   * @returns The reply options for editing or replying to an interaction.
+   */
   public static internal(
     framework: DiscordFramework,
     message: string,
@@ -74,6 +105,14 @@ export class ResponseBuilder {
     );
   }
 
+  /**
+   * Builds a permission error response for missing permissions.
+   *
+   * @param permissions - The required permissions.
+   * @param origin - 'You' or 'I', indicating who is missing the permissions.
+   * @param channel - Whether the permission is channel-specific.
+   * @returns The reply options for editing or replying to an interaction.
+   */
   public static permission(
     permissions: PermissionResolvable,
     origin: 'You' | 'I',

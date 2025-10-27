@@ -32,10 +32,12 @@ type StoredGeneric<T> = {
  *
  * Each state entry is associated with a unique storageId and can optionally be tied to a userId.
  *
- * @private
  * @remarks This class is used internally by DDFramework and is not intended for direct initialization by end-users.
  */
 export class StateManager {
+  /**
+   * Internal map for storing state entries with expiration.
+   */
   private state = new MapWithExpiration<string, StoredGeneric<unknown>>(5 * 60 * 1000);
 
   /**
@@ -43,7 +45,7 @@ export class StateManager {
    *
    * @param groupId - A group identifier to categorize the state entry.
    * @param packet - The data to be stored in the state.
-   * @param options - Optional parameters for state management.
+   * @param options - Optional parameters for state management (userId, expiration).
    * @returns The storageId of the created state entry.
    */
   public make(
@@ -67,7 +69,7 @@ export class StateManager {
    * @typeParam T - The type of value stored.
    * @param storageId - The storage ID of the state entry.
    * @param userId - The user ID to match for retrieval.
-   * @returns The stored value if found and the userId matches, otherwise null.
+   * @returns The stored value and groupId if found and the userId matches, otherwise null.
    */
   public retrieve<T>(
     storageId: string,

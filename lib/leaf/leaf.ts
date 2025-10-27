@@ -103,11 +103,6 @@ export class LeafManager {
     definition: LeafDefinition<T, V>,
   ): void {
     for (const path of this.iterateCommandPaths(definition.literal.name, definition.literal.options, definition.namespace)) {
-      this.framework.ledger.trace('[TraceInitialize] linkLeaf()', {
-        name: definition.literal.name,
-        options: definition.literal.options,
-        path,
-      });
       this.registerLink(path, definition);
     }
 

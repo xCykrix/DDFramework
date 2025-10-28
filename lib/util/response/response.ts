@@ -1,5 +1,5 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
-import { type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+import { ActionRowBuilder, type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 /**
  * Utility class for building and sending Discord.js interaction responses.
@@ -64,6 +64,31 @@ export class ResponseBuilder {
       components: [
         new ContainerBuilder()
           .addTextDisplayComponents((b) => b.setContent(content.join('\n')))
+          .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
+          .addTextDisplayComponents((b) =>
+            b.setContent(
+              `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
+            )
+          ),
+      ],
+    };
+  }
+
+  /**
+   * Builds a fixed-content interaction reply with a timestamp and an action row.
+   *
+   * @param content - The lines of content to display.
+   * @param actionrowBuilder - The action builder to append.
+   * @returns The reply options for editing or replying to an interaction.
+   */
+  public static fixedWithActionRow(content: string[], actionrowBuilder: ActionRowBuilder): InteractionEditReplyOptions {
+    return {
+      flags: MessageFlags.IsComponentsV2,
+      components: [
+        new ContainerBuilder()
+          .addTextDisplayComponents((b) => b.setContent(content.join('\n')))
+          .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
+          .addActionRowComponents(actionrowBuilder)
           .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
           .addTextDisplayComponents((b) =>
             b.setContent(

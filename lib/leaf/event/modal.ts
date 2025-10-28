@@ -15,7 +15,7 @@ import { intercept } from '../intercept.ts';
 export function injectModalHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',
-    intercept(framework, 'leaf/event/modal', async (interaction) => {
+    intercept('interactionCreate', framework, 'leaf/event/modal', async (interaction) => {
       // Only process modal submit interactions
       if (!interaction.isModalSubmit()) return;
 

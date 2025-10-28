@@ -17,7 +17,7 @@ import { intercept } from '../intercept.ts';
 export function injectAutoCompleteHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',
-    intercept(framework, 'leaf/event/autocomplete', async (interaction) => {
+    intercept('interactionCreate', framework, 'leaf/event/autocomplete', async (interaction) => {
       // Verify Interaction is Processable by Handler.
       if (!interaction.isAutocomplete()) return;
 

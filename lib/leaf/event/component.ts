@@ -15,7 +15,7 @@ import { intercept } from '../intercept.ts';
 export function injectComponentHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',
-    intercept(framework, 'leaf/event/component', async (interaction) => {
+    intercept('interactionCreate', framework, 'leaf/event/component', async (interaction) => {
       // Verify Interaction is Processable by Handler.
       if (!interaction.isMessageComponent()) return;
       if (!interaction.customId) {

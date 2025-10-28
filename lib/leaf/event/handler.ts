@@ -19,7 +19,7 @@ import { parse } from '../parse.ts';
 export function injectCommandHandler(framework: DiscordFramework): void {
   framework.djs.on(
     'interactionCreate',
-    intercept(framework, 'leaf/event/handler', async (interaction) => {
+    intercept('interactionCreate', framework, 'leaf/event/handler', async (interaction) => {
       // Verify Interaction is Processable by Handler.
       if (!interaction.isChatInputCommand()) return;
       if (interaction.guildId === null) return;

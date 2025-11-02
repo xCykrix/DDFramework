@@ -20,7 +20,7 @@ import { StoredRetrievalGeneric } from '../../types.ts';
  * // retrieving a typed packet from the state manager
  * const packet = defineState<MyPacketType>(stateManager.retrieve(id, userId));
  */
-export function defineState<T>(state: StoredRetrievalGeneric<T>, expectedGroupId?: string): T {
+export function defineState<T>(state: StoredRetrievalGeneric<T> | StoredRetrievalGeneric<unknown>, expectedGroupId?: string): T {
   if (expectedGroupId !== undefined && state.groupId !== expectedGroupId) {
     throw new Deno.errors.InvalidData(`Expected groupId "${expectedGroupId}", but received "${state.groupId}".`);
   }

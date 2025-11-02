@@ -76,7 +76,7 @@ export function injectComponentHandler(framework: DiscordFramework): void {
       await linkedHandler.component({
         framework,
         interaction,
-        customId: interaction.customId,
+        customId: state.groupId,
         state,
       });
     }),

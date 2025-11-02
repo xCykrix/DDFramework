@@ -1,5 +1,5 @@
 import type { DiscordFramework } from '@amethyst/ddframework';
-import { type ActionRowBuilder, type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+import { type ActionRowBuilder, type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, InteractionUpdateOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 /**
  * Utility class for building and sending Discord.js interaction responses.
@@ -18,11 +18,15 @@ export class ResponseBuilder {
       | ChatInputCommandInteraction
       | MessageComponentInteraction
       | ModalSubmitInteraction,
-    options: InteractionReplyOptions | InteractionEditReplyOptions,
+    options: InteractionReplyOptions | InteractionEditReplyOptions | InteractionUpdateOptions,
     forceEditReply = false,
   ): Promise<void> {
     if (interaction.replied || interaction.deferred || forceEditReply) {
-      await interaction.editReply(options as InteractionEditReplyOptions);
+      if (interaction.isModalSubmit() && interaction.isFromMessage()) {
+        await interaction.update(options as InteractionUpdateOptions);
+      } else {
+        await interaction.editReply(options as InteractionEditReplyOptions);
+      }
     } else {
       await interaction.reply(options as InteractionReplyOptions);
     }

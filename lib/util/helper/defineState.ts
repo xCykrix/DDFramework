@@ -1,3 +1,5 @@
+import { StoredRetrievalGeneric } from '../../types.ts';
+
 /**
  * Casts an unknown state value to a strongly-typed value.
  *
@@ -18,6 +20,9 @@
  * // retrieving a typed packet from the state manager
  * const packet = defineState<MyPacketType>(stateManager.retrieve(id, userId));
  */
-export function defineState<T>(state: unknown): T {
-  return state as T;
+export function defineState<T>(state: StoredRetrievalGeneric<T>, expectedGroupId?: string): T {
+  if (expectedGroupId !== undefined && state.groupId !== expectedGroupId) {
+    throw new Deno.errors.InvalidData(`Expected groupId "${expectedGroupId}", but received "${state.groupId}".`);
+  }
+  return state.value as T;
 }

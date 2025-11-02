@@ -19,17 +19,33 @@ export class ResponseBuilder {
       | MessageComponentInteraction
       | ModalSubmitInteraction,
     options: InteractionReplyOptions | InteractionEditReplyOptions | InteractionUpdateOptions,
-    forceEditReply = false,
+    updateReply = true,
   ): Promise<void> {
-    if (interaction.replied || interaction.deferred || forceEditReply) {
-      if (interaction.isModalSubmit() && interaction.isFromMessage()) {
-        await interaction.update(options as InteractionUpdateOptions);
-      } else {
+    // Just reply if we do not want to run logic parsing.
+    if (!updateReply) {
+      if (interaction.deferred) {
         await interaction.editReply(options as InteractionEditReplyOptions);
+      } else {
+        await interaction.reply(options as InteractionReplyOptions);
       }
-    } else {
-      await interaction.reply(options as InteractionReplyOptions);
+      return;
     }
+
+    if (interaction.isButton() && interaction.message) {
+      await interaction.update(options as InteractionUpdateOptions);
+      return;
+    }
+    if (interaction.isModalSubmit() && interaction.isFromMessage()) {
+      await interaction.update(options as InteractionUpdateOptions);
+      return;
+    }
+
+    if (interaction.replied || interaction.deferred) {
+      await interaction.editReply(options as InteractionEditReplyOptions);
+    }
+
+    // Catch-all Reply
+    await interaction.reply(options as InteractionReplyOptions);
   }
 
   /**

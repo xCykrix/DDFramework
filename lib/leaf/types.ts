@@ -1,5 +1,6 @@
 import type { APIApplicationCommandAttachmentOption, APIApplicationCommandBooleanOption, APIApplicationCommandChannelOption, APIApplicationCommandIntegerOption, APIApplicationCommandMentionableOption, APIApplicationCommandNumberOption, APIApplicationCommandOptionChoice, APIApplicationCommandRoleOption, APIApplicationCommandStringOption, APIApplicationCommandSubcommandGroupOption, APIApplicationCommandSubcommandOption, APIApplicationCommandUserOption, ApplicationCommandOptionType, ApplicationCommandType, Attachment, AutocompleteInteraction, ChatInputCommandInteraction, Guild, GuildBasedChannel, GuildChannelType, GuildMember, MessageComponentInteraction, ModalComponentResolver, ModalSubmitInteraction, PermissionResolvable, RESTPostAPIChatInputApplicationCommandsJSONBody, Role, User } from 'discord.js';
 import type { DiscordFramework } from '../../mod.ts';
+import { StoredRetrievalGeneric } from '../types.ts';
 
 /**
  * Represents a primitive option for a Discord application command.
@@ -142,7 +143,7 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
     framework: DiscordFramework;
     interaction: MessageComponentInteraction;
     customId: string;
-    state: unknown | null;
+    state: StoredRetrievalGeneric<unknown> | null;
   }): Promise<void>;
   /**
    * Optional handler for modal submissions.
@@ -152,7 +153,7 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
     interaction: ModalSubmitInteraction;
     customId: string;
     resolver: ModalComponentResolver;
-    state: unknown | null;
+    state: StoredRetrievalGeneric<unknown> | null;
   }): Promise<void>;
   /**
    * Optional handler for autocomplete events.

@@ -37,4 +37,4 @@ jobs:
           search-text: '{{VERSION}}'
           replacement-text: '0.1.0-rc.${{ github.sha }}'
       - name: 'Publish Package'
-        run: deno publish --allow-dirty --set-version 0.1.0-rc.${{ github.sha }}
+        run: deno publish --allow-dirty --set-version 0.1.0-next.${{ github.sha }}

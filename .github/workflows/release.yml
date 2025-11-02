@@ -30,5 +30,10 @@ jobs:
       #     files: |
       #       LICENSE
       #       README.md
+      - name: 'Set Deployment Version'
+        uses: restackio/update-json-file-action@2.1
+        with:
+          file: deno.jsonc
+          fields: "{\"version\": \"0.1.0-rc.${{ github.sha }}\"}"
       - name: 'Publish Package'
         run: deno publish --set-version 0.1.0-rc.${{ github.sha }}

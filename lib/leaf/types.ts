@@ -153,7 +153,7 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
     interaction: ModalSubmitInteraction;
     customId: string;
     resolver: ModalComponentResolver;
-    state: StoredRetrievalGeneric<unknown> | null;
+    state: StoredRetrievalGeneric<unknown>       | null;
   }): Promise<void>;
   /**
    * Optional handler for autocomplete events.

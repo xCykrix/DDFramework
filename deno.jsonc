@@ -1,6 +1,6 @@
 {
   "name": "@amethyst/ddframework",
-  "version": "0.0.28",
+  "version": "{{VERSION}}",
   "license": "MIT",
   "exports": {
     ".": "./mod.ts",

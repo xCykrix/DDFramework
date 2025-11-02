@@ -19,8 +19,9 @@ export class ResponseBuilder {
       | MessageComponentInteraction
       | ModalSubmitInteraction,
     options: InteractionReplyOptions | InteractionEditReplyOptions,
+    forceEditReply = false,
   ): Promise<void> {
-    if (interaction.replied || interaction.deferred) {
+    if (interaction.replied || interaction.deferred || forceEditReply) {
       await interaction.editReply(options as InteractionEditReplyOptions);
     } else {
       await interaction.reply(options as InteractionReplyOptions);

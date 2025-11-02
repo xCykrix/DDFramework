@@ -140,7 +140,7 @@ export type DynamicInjectedHandler<V extends ChatInputCommandJSON> = {
    */
   component?(passthrough: {
     framework: DiscordFramework;
-    interaction: MessageComponentInteraction | ModalSubmitInteraction;
+    interaction: MessageComponentInteraction;
     customId: string;
     state: unknown | null;
   }): Promise<void>;

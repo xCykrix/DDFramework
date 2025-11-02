@@ -2,8 +2,8 @@ name: Automatic Release
 
 on:
   push:
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
 
 permissions:
   actions: write
@@ -31,4 +31,4 @@ jobs:
             LICENSE
             README.md
       - name: 'Publish Package'
-        run: deno publish
+        run: deno publish --set-version 0.1.0-rc.${{ github.sha }}

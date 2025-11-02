@@ -27,6 +27,13 @@ type StoredGeneric<T> = {
   value: T;
 };
 
+export type StoredRetrievalGeneric<T> = {
+  /** Group identifier for categorizing the state entry. */
+  groupId: string;
+  /** The value stored in the state entry. */
+  value: T;
+};
+
 /**
  * A utility class for managing temporary state entries with expiration.
  *
@@ -74,10 +81,7 @@ export class StateManager {
   public retrieve<T>(
     storageId: string,
     userId: string,
-  ): {
-    groupId: string;
-    value: T;
-  } | null {
+  ): StoredRetrievalGeneric<T> | null {
     const retrieval = this.state.get(storageId) as StoredGeneric<T> | undefined;
     if (retrieval === undefined || (retrieval.userId !== userId)) return null;
     return {

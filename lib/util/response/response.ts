@@ -31,12 +31,12 @@ export class ResponseBuilder {
       return;
     }
 
-    if (interaction.isButton() && interaction.message) {
-      await interaction.update(options as InteractionUpdateOptions);
-      return;
-    }
-    if (interaction.isModalSubmit() && interaction.isFromMessage()) {
-      await interaction.update(options as InteractionUpdateOptions);
+    if ((interaction.isButton() && interaction.message) || (interaction.isModalSubmit() && interaction.isFromMessage())) {
+      if (interaction.replied || interaction.deferred) {
+        await interaction.editReply(options as InteractionEditReplyOptions);
+      } else {
+        await interaction.update(options as InteractionUpdateOptions);
+      }
       return;
     }
 

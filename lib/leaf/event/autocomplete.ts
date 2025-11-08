@@ -73,9 +73,15 @@ export function injectAutoCompleteHandler(framework: DiscordFramework): void {
 
       // Prepare haystack for fuzzy search.
       const haystack = autocompleted.results.map((result) => result.name);
-      const needle = `${focused.value ?? ''}`;
+      const needle = `${focused.value ?? ''}`.trim();
       const uf = new uFuzzy();
       const choices: APIApplicationCommandOptionChoice[] = [];
+      framework.ledger.trace(`Autocomplete Trace`, {
+        autocompleted,
+        valueLookback,
+        haystack,
+        needle,
+      });
 
       // Perform fuzzy search and respond with filtered choices.
       if (needle === '' && autocompleted.allowEmptySearch) {

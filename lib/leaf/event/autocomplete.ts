@@ -85,6 +85,7 @@ export function injectAutoCompleteHandler(framework: DiscordFramework): void {
 
       // Perform fuzzy search and respond with filtered choices.
       if (needle === '' && autocompleted.allowEmptySearch) {
+        framework.ledger.trace(`Autocomplete Trace - Allow Empty Search`, { autocompleted, valueLookback, needle });
         choices.push(...autocompleted.results);
       } else {
         const idxs = uf.filter(haystack, needle);
@@ -98,6 +99,7 @@ export function injectAutoCompleteHandler(framework: DiscordFramework): void {
         }
 
         if (idxs.length <= 500) {
+          framework.ledger.trace(`Autocomplete Trace - Fuzzy Search Results`, { idxs, haystack, needle });
           const info = uf.info(idxs, haystack, needle);
           const order = uf.sort(info, haystack, needle);
           const limit = Math.min(order.length, autocompleted.perPage ?? 10, 10);
@@ -116,6 +118,8 @@ export function injectAutoCompleteHandler(framework: DiscordFramework): void {
           }]);
           return;
         }
+
+        framework.ledger.trace('Autocomplete Trace - Responding with Filtered Choices', { choices });
 
         // Respond with filtered choices.
         await interaction.respond(choices);

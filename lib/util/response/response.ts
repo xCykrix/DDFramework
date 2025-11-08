@@ -42,6 +42,7 @@ export class ResponseBuilder {
 
     if (interaction.replied || interaction.deferred) {
       await interaction.editReply(options as InteractionEditReplyOptions);
+      return;
     }
 
     // Catch-all Reply

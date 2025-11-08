@@ -1,9 +1,8 @@
 ---
 
 name: 'Bug Report'
-about: 'This template is used to report unintended behavior of our projects.'
+description: 'This template is used to report unintended behavior of our projects.'
 title: '[BUG] A brief overview of your concern.'
-ref: 'main'
 labels:
   - 'Type: Bug'
   - 'State: Conversation'

@@ -113,7 +113,15 @@ export function injectAutoCompleteHandler(framework: DiscordFramework): void {
       }
 
       // Respond with filtered choices.
-      await interaction.respond(choices);
+      if (autocompleted.perPage === undefined) autocompleted.perPage = 10;
+      if (autocompleted.perPage > 25) autocompleted.perPage = 25;
+      if (autocompleted.perPage > choices.length) autocompleted.perPage = choices.length;
+      await interaction.respond(
+        choices.slice(
+          0,
+          autocompleted.perPage,
+        ),
+      );
     }),
   );
 }

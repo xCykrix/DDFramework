@@ -56,21 +56,24 @@ export class ResponseBuilder {
    * @returns The reply options for editing or replying to an interaction.
    */
   public static full(
-    callback: (builder: ContainerBuilder) => void,
+    callback: (builder: ContainerBuilder) => ContainerBuilder,
+    withFooter = true,
   ): InteractionEditReplyOptions {
-    const builder = new ContainerBuilder();
-    callback(builder);
+    let builder = new ContainerBuilder();
+    builder = callback(builder);
+    if (withFooter) {
+      builder = builder
+        .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
+        .addTextDisplayComponents((b) =>
+          b.setContent(
+            `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
+          )
+        );
+    }
+
     return {
       flags: MessageFlags.IsComponentsV2,
-      components: [
-        builder
-          .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small))
-          .addTextDisplayComponents((b) =>
-            b.setContent(
-              `-# <t:${Math.floor(Date.now() / 1000)}:F>`,
-            )
-          ),
-      ],
+      components: [builder],
     };
   }
 

@@ -1,10 +1,9 @@
-import { util } from '@amethyst/ddframework/lib/utils.ts';
 import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
 import { Ledger } from 'ledger';
 import { LeafManager } from './lib/leaf/leaf.ts';
 import { Partial } from './lib/util/helper/partial.ts';
 import { StateManager } from './lib/util/state/state.ts';
-
+import { util } from './lib/utils.ts';
 /**
  * Main entry point for the DiscordFramework, providing configuration, logging, and Discord.js client integration.
  *

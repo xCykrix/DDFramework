@@ -1,3 +1,4 @@
+import { ulid } from '@std/ulid';
 import { intercept } from './leaf/intercept.ts';
 import { defineState } from './util/helper/defineState.ts';
 import { ResponseBuilder } from './util/response/response.ts';
@@ -10,3 +11,7 @@ import { ResponseBuilder } from './util/response/response.ts';
  * - `ResponseBuilder`: Discord.js interaction response utilities
  */
 export { defineState, intercept, ResponseBuilder };
+
+export const util = {
+  ulid: ulid,
+};

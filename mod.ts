@@ -1,3 +1,4 @@
+import { util } from '@amethyst/ddframework/lib/utils.ts';
 import { Client, Events, GatewayIntentBits, Partials } from 'discord.js';
 import { Ledger } from 'ledger';
 import { LeafManager } from './lib/leaf/leaf.ts';
@@ -37,6 +38,9 @@ export class DiscordFramework {
 
   /** Helper for resolving Discord.js partial structures. */
   public partial: Partial;
+
+  /** The utility helpers for the framework. */
+  public util = util;
 
   /**
    * Creates a new DiscordFramework instance.

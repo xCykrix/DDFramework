@@ -21,56 +21,60 @@ export function injectModalHandler(framework: DiscordFramework): void {
 
       // Ensure the interaction has a customId
       if (!interaction.customId) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Missing Callback Identifier',
+          description: 'This is likely a bug. Please report this issue if it continues to occur.',
+          error: {
             framework,
-            'Missing Callback Identifier. This is likely a bug.',
-            new Deno.errors.NotFound('Unable to find customId for Modal Submit Callback'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: 'Unable to find customId for Modal Submit Callback',
+          },
+        });
         return;
       }
 
       // Retrieve state for the modal interaction
       const state = framework.state.retrieve(interaction.customId, interaction.user.id);
       if (state === null) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Invalid/Expired Callback State',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Invalid/Expired State of Callback Identifier. Please issue the original request again.',
-            new Deno.errors.NotFound('State not found or expired for Modal Submit Callback.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: `State not found or expired for Modal Submit Callback: \`${interaction.customId}\``,
+          },
+        });
         return;
       }
 
       // Retrieve linked handler options
       const linkedOptions = framework.leaf.linkedOptions.get(state.groupId);
       if (!linkedOptions) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Linked Options Not Found',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Linked options not found for the callback identifier.',
-            new Deno.errors.NotFound('Linked options not found for Modal Submit Callback.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: 'Linked options not found for Modal Submit Callback.',
+          },
+        });
         return;
       }
 
       // Retrieve the linked handler for the modal
       const linkedHandler = framework.leaf.linkedDynamics.get(state.groupId);
       if (linkedHandler === undefined || linkedHandler.modal === undefined) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Linked Handler Not Found',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Linked handler not found for the callback identifier.',
-            new Deno.errors.NotFound('Linked handler or modal callback not found for Message Component Callback.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: 'Linked handler not found for Modal Submit Callback.',
+          },
+        });
         return;
       }
 

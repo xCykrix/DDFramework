@@ -19,56 +19,60 @@ export function injectComponentHandler(framework: DiscordFramework): void {
       // Verify Interaction is Processable by Handler.
       if (!interaction.isMessageComponent()) return;
       if (!interaction.customId) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Missing Callback Identifier',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Missing Callback Identifier. This is likely a bug.',
-            new Deno.errors.NotFound('Unable to find customId for Message Component Callback'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: `Unable to find customId for Message Component Callback: \`${interaction.customId}\``,
+          },
+        });
         return;
       }
 
       // Get State or Reject Interaction.
       const state = framework.state.retrieve(interaction.customId, interaction.user.id);
       if (state === null) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Invalid/Expired Callback State',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Invalid/Expired State of Callback Identifier. Please issue the original request again.',
-            new Deno.errors.NotFound('State not found or expired for Message Component Callback.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: `State not found or expired for Message Component Callback: \`${interaction.customId}\``,
+          },
+        });
         return;
       }
 
       // Get Linked Options or Reject Interaction.
       const linkedOptions = framework.leaf.linkedOptions.get(state.groupId);
       if (!linkedOptions) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Linked Options Not Found',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Linked options not found for the callback identifier.',
-            new Deno.errors.NotFound('Linked options not found for Message Component Callback.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: 'Linked options not found for Message Component Callback.',
+          },
+        });
         return;
       }
 
       // Check Linked Handler
       const linkedHandler = framework.leaf.linkedDynamics.get(state.groupId);
       if (linkedHandler === undefined || linkedHandler.component === undefined) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Linked Handler Not Found',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Linked handler not found for the callback identifier.',
-            new Deno.errors.NotFound('Linked handler or component callback not found for Message Component Callback.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: 'Linked handler or component callback not found for Message Component Callback.',
+          },
+        });
         return;
       }
 

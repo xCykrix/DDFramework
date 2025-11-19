@@ -34,28 +34,30 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       // Get Linked Options.
       const options = framework.leaf.linkedOptions.get(path);
       if (options === undefined) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Missing Linked Options',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Missing Linked Options for Interaction.',
-            new Deno.errors.NotFound(`Missing Linked Options for Interaction (${path})`),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: `Missing linked options for Interaction (${path})`,
+          },
+        });
         return;
       }
 
       // Get Linked Handler.
       const linkedHandler = framework.leaf.linkedDynamics.get(path);
       if (linkedHandler === undefined) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Missing Linked Handler',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Missing Linked Handler for Interaction.',
-            new Deno.errors.NotFound(`Missing Linked Handler for Interaction (${path})`),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: `Missing linked handler for Interaction (${path})`,
+          },
+        });
         return;
       }
 
@@ -64,76 +66,75 @@ export function injectCommandHandler(framework: DiscordFramework): void {
       const invoker = await framework.partial.member(interaction.member as GuildMember);
       const bot = await framework.partial.member(interaction.guild!.members.me as GuildMember);
       if (channel === null || invoker === null || bot === null) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Failed to Resolve Interaction Objects',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Failed to Resolve Interaction Objects.',
-            new Deno.errors.NotFound('Failed to resolve one of channel, invoker, or bot.'),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: 'Failed to resolve one of channel, invoker, or bot.',
+          },
+        });
         return;
       }
 
       // Check Channel Types.
       if (!options.channelTypesRequired.includes(channel.type as GuildChannelType)) {
-        await ResponseBuilder.handle(
-          interaction,
-          ResponseBuilder.internal(
+        await ResponseBuilder.make({
+          header: 'Invalid Channel Type',
+          description: 'Please re-issue the original request. Otherwise, report this as an issue if this continues to occur.',
+          error: {
             framework,
-            'Invalid Channel Type for Interaction.',
-            new Deno.errors.InvalidData(`Channel type ${channel.type} is not allowed for this interaction.`),
-          ),
-        );
+            ulid: framework.util.ulid(),
+            cause: `Channel type ${channel.type} is not allowed for this interaction.`,
+          },
+        });
         return;
       }
 
       // Check Permissions.
       if (!invoker.permissions.has(options.guild.userRequiredGuildPermissions)) {
-        await ResponseBuilder.handle(
+        await ResponseBuilder.pcheck({
+          framework,
           interaction,
-          ResponseBuilder.permission(
-            options.guild.userRequiredGuildPermissions,
-            'You',
-            false,
-          ),
-        );
+          permissions: options.guild.userRequiredGuildPermissions,
+          origin: 'You',
+          channel: false,
+        });
         return;
       }
 
       if (!invoker.permissionsIn(channel).has(options.guild.userRequiredChannelPermissions)) {
-        await ResponseBuilder.handle(
+        await ResponseBuilder.pcheck({
+          framework,
           interaction,
-          ResponseBuilder.permission(
-            options.guild.userRequiredChannelPermissions,
-            'You',
-            true,
-          ),
-        );
+          permissions: options.guild.userRequiredChannelPermissions,
+          origin: 'You',
+          channel: true,
+        });
+
         return;
       }
 
       if (!bot.permissions.has(options.guild.botRequiredGuildPermissions)) {
-        await ResponseBuilder.handle(
+        await ResponseBuilder.pcheck({
+          framework,
           interaction,
-          ResponseBuilder.permission(
-            options.guild.botRequiredGuildPermissions,
-            'I',
-            false,
-          ),
-        );
+          permissions: options.guild.botRequiredGuildPermissions,
+          origin: 'I',
+          channel: false,
+        });
         return;
       }
 
       if (!bot.permissionsIn(channel).has(options.guild.botRequiredChannelPermissions)) {
-        await ResponseBuilder.handle(
+        await ResponseBuilder.pcheck({
+          framework,
           interaction,
-          ResponseBuilder.permission(
-            options.guild.botRequiredChannelPermissions,
-            'I',
-            true,
-          ),
-        );
+          permissions: options.guild.botRequiredChannelPermissions,
+          origin: 'I',
+          channel: true,
+        });
         return;
       }
 

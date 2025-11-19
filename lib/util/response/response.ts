@@ -109,18 +109,23 @@ export class ResponseBuilder {
     };
   }
 
-  public static pcheck(options: {
+  public static async pcheck(options: {
+    framework: DiscordFramework;
+    interaction:
+      | ChatInputCommandInteraction
+      | MessageComponentInteraction
+      | ModalSubmitInteraction;
     permissions: PermissionResolvable;
     origin: 'You' | 'I';
     channel: boolean;
-  }): InteractionEditReplyOptions {
-    return this.make({
+  }): Promise<void> {
+    await this.make({
       header: 'Permission Error',
       description: [
         `${options.origin} do not have the required permissions to perform this action${options.channel ? ` in this channel.` : '.'}.`,
         '',
         `**Missing Permissions**: ${options.permissions.toString()}`,
       ].join('\n'),
-    }) as InteractionEditReplyOptions;
+    }, options.interaction) as InteractionEditReplyOptions;
   }
 }

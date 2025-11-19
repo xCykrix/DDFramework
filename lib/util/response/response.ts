@@ -1,5 +1,5 @@
-import { DiscordFramework } from '@amethyst/ddframework';
-import { type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, InteractionUpdateOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
+import type { DiscordFramework } from '@amethyst/ddframework';
+import { type ChatInputCommandInteraction, ContainerBuilder, type InteractionEditReplyOptions, type InteractionReplyOptions, type InteractionUpdateOptions, type MessageComponentInteraction, MessageFlags, type ModalSubmitInteraction, type PermissionResolvable, SeparatorSpacingSize } from 'discord.js';
 
 /**
  * Utility class for building and sending Discord.js interaction responses.

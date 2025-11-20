@@ -52,7 +52,7 @@ export class ResponseBuilder {
   public static async make(
     struct: {
       header?: string;
-      description?: string;
+      description?: string | string[];
       callback?: (builder: ContainerBuilder) => ContainerBuilder;
       error?: {
         framework: DiscordFramework;
@@ -77,7 +77,7 @@ export class ResponseBuilder {
     }
     if (struct.description) {
       builder = builder
-        .addTextDisplayComponents((b) => b.setContent(`${struct.description}`))
+        .addTextDisplayComponents((b) => b.setContent(`${Array.isArray(struct.description) ? struct.description.join('\n') : struct.description}`))
         .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small));
     }
     builder = struct.callback ? struct.callback(builder) : builder;

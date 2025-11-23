@@ -19,7 +19,7 @@ export class ResponseBuilder {
       | MessageComponentInteraction
       | ModalSubmitInteraction,
     options: InteractionReplyOptions | InteractionEditReplyOptions | InteractionUpdateOptions,
-    forceUpdateReply = true,
+    forceUpdateReply = false,
   ): Promise<void> {
     // Just reply if we do not want to run logic parsing.
     if (forceUpdateReply) {
@@ -31,7 +31,7 @@ export class ResponseBuilder {
       return;
     }
 
-    if ((interaction.isButton() && interaction.message) || (interaction.isModalSubmit() && interaction.isFromMessage())) {
+    if ((interaction.isButton() && interaction.message) || interaction.isSelectMenu() || (interaction.isModalSubmit() && interaction.isFromMessage())) {
       if (interaction.replied || interaction.deferred) {
         await interaction.editReply(options as InteractionEditReplyOptions);
       } else {

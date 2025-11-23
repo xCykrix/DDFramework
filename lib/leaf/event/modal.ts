@@ -82,7 +82,7 @@ export function injectModalHandler(framework: DiscordFramework): void {
       await linkedHandler.modal({
         framework,
         interaction,
-        customId: interaction.customId,
+        customId: state.groupId,
         resolver: interaction.components,
         state,
       });

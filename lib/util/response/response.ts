@@ -22,7 +22,7 @@ export class ResponseBuilder {
     forceUpdateReply = true,
   ): Promise<void> {
     // Just reply if we do not want to run logic parsing.
-    if (!forceUpdateReply) {
+    if (forceUpdateReply) {
       if (interaction.deferred) {
         await interaction.editReply(options as InteractionEditReplyOptions);
       } else {

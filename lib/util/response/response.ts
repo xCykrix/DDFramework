@@ -109,6 +109,23 @@ export class ResponseBuilder {
     };
   }
 
+  public static async processing(options: {
+    framework: DiscordFramework;
+    interaction:
+      | ChatInputCommandInteraction
+      | MessageComponentInteraction
+      | ModalSubmitInteraction;
+  }): Promise<void> {
+    await this.make({
+      header: 'Processing Request',
+      description: [
+        'Your request has been acknowledged and is being processed. Please wait...',
+        '',
+        'This message will be updated once processing is complete. If this takes longer than expected, please try again after a moment or report an issue..',
+      ],
+    }, options.interaction) as InteractionEditReplyOptions;
+  }
+
   public static async pcheck(options: {
     framework: DiscordFramework;
     interaction:

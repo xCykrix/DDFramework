@@ -57,7 +57,7 @@ export class ResponseBuilder {
       error?: {
         framework: DiscordFramework;
         ulid: string;
-        cause: string;
+        cause: string | Error;
       };
       options?: {
         timestamp?: boolean;

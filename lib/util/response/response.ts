@@ -54,20 +54,21 @@ export class ResponseBuilder {
       header?: string;
       description?: string | string[];
       callback?: (builder: ContainerBuilder) => ContainerBuilder;
+      footer?: {
+        format: string;
+        arguments: Record<string, string>;
+      };
       error?: {
         framework: DiscordFramework;
         ulid: string;
         cause: string | Error;
-      };
-      options?: {
-        timestamp?: boolean;
-        forceUpdateReply?: boolean;
       };
     },
     interaction?:
       | ChatInputCommandInteraction
       | MessageComponentInteraction
       | ModalSubmitInteraction,
+    forceUpdateReply = false,
   ): Promise<void | InteractionEditReplyOptions> {
     let builder = new ContainerBuilder();
     if (struct.header) {
@@ -77,16 +78,27 @@ export class ResponseBuilder {
     }
     if (struct.description) {
       builder = builder
-        .addTextDisplayComponents((b) => b.setContent(`${Array.isArray(struct.description) ? struct.description.join('\n') : struct.description}`))
-        .addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small));
+        .addTextDisplayComponents((b) => b.setContent(`${Array.isArray(struct.description) ? struct.description.join('\n') : struct.description}`));
+      if (struct.error?.ulid) {
+        builder = builder.addTextDisplayComponents((b) => b.setContent(`-# **Reference ID**: \`${struct.error?.ulid ?? 'N/A'}\``));
+      }
+      builder = builder.addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small));
     }
     builder = struct.callback ? struct.callback(builder) : builder;
     if (!struct.header && !struct.description) {
       builder = builder.addSeparatorComponents((b) => b.setSpacing(SeparatorSpacingSize.Small));
     }
-    if (struct.options?.timestamp ?? true) {
+    if (struct.footer === undefined || struct.footer?.format !== undefined) {
+      let footer = `${struct.footer?.format ?? '{{TIMESTAMP}}'}`;
+
+      const ent = struct.footer?.arguments ?? {};
+      for (const [key, value] of Object.entries(ent)) {
+        footer = footer.replace(`{{${key}}}`, value);
+      }
+      footer = footer.replace('{{TIMESTAMP}}', `<t:${Math.floor(Date.now() / 1000)}:F>`);
+
       builder = builder
-        .addTextDisplayComponents((b) => b.setContent(`-# <t:${Math.floor(Date.now() / 1000)}:F>` + (struct.error?.ulid ? ` | Reference: ${struct.error.ulid}` : '')));
+        .addTextDisplayComponents((b) => b.setContent(`-# ${footer}`));
     }
     if (struct.error?.cause) {
       struct.error?.framework.ledger.warning(
@@ -100,7 +112,7 @@ export class ResponseBuilder {
       );
     }
     if (interaction) {
-      await this.handle(interaction, { flags: MessageFlags.IsComponentsV2, components: [builder] }, struct.options?.forceUpdateReply ?? false);
+      await this.handle(interaction, { flags: MessageFlags.IsComponentsV2, components: [builder] }, forceUpdateReply);
       return;
     }
     return {
